@@ -1,0 +1,148 @@
+
+
+.dashboard-div {
+
+
+    
+    }
+    
+    .leftdash-div {
+       position: relative;
+       padding: 1% 2% 0px 1%;
+      
+    }
+    
+    .contains {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+       
+        
+        height: 100vh;
+    
+        margin-left: 10%;
+        
+    }
+    
+    .dashboard-div .contains .card-table-div {
+
+        position: relative;
+        top: 3%;
+       
+    }
+    .rightdash-table {
+        height: 68vh;
+    }
+    
+    .rightdash-div {
+        
+       
+        position: relative;
+        left: 3%;
+        bottom: 1%;
+        display: flex;
+        flex-direction: column;
+        
+        
+       
+    }
+
+
+
+    .rightdashcard {
+        display: flex;
+        
+    }
+    .heading h2 {
+       color:  #ffa33a; 
+    }
+    
+    .content span {
+        font-size: 25px;
+        font-weight: 600;
+       
+    }
+    .content p {
+        font-size: 20px;
+        margin-top: 10%;
+         color: #000000; ;
+        line-height: 3.0rem;
+    }
+    
+    .dashborad-table-heading{
+          
+        font-size: 30px;
+       
+      
+       
+    }
+    
+ 
+    
+    
+    
+    
+    .cards-div {
+         
+      
+         display: grid;
+        
+         grid-template-columns:  auto 1fr;;
+        
+         width: 100%;
+        
+     
+         
+         margin-right: 30px; 
+         place-self: center;
+         gap: 10px;
+    
+    
+    }
+    
+    .cards-div .card-div:nth-child(1)  img{
+      
+    
+       position: relative;
+       bottom:4.5%;
+        
+        
+    }
+    
+    .cards-div .card-div:nth-child(3),
+    .cards-div .card-div:nth-child(4) {
+    
+        margin-top: -5px;
+    }
+    
+    .cards-div .card-div:nth-child(3) img {
+        margin-left: 2%;
+    }
+    
+    .cards-div .card-div:nth-child(4) img {
+        
+        width: 8vw; 
+        margin-top: 6%;
+    }
+    
+    
+    .card-div {
+        place-self: center;
+        margin:10%;
+        
+        
+    }
+    
+
+    .dashboard-table {
+        width: 30vw;
+        height: 60vh;
+        margin-top: 2%;
+    }
+    /**
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin-left: 20%;
+    **/

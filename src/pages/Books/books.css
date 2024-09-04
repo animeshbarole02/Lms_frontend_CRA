@@ -1,0 +1,34 @@
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px; 
+  }
+  
+  .action-button {
+    padding: 2px 4px; 
+    border: 1.5px solid #e04736;;
+    cursor: pointer;
+    width: 5vw;
+    border-radius: 5px;
+  }
+  
+  .issue-button {
+    background-color: #ffffff; 
+    color: rgb(0, 0, 0);
+  }
+  
+  .history-button {
+    background-color: #ffffff;
+    color: rgb(0, 0, 0);
+  }
+  
+  .action-button:hover {
+    opacity: 0.8;
+  }
+  
+  .action-button:active {
+    transform: scale(0.95);
+  }
+  

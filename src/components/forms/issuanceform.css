@@ -1,0 +1,53 @@
+.issuance-form {
+    display: flex;
+    flex-direction: column;
+  
+  }
+
+.issuance-form h2 {
+  color: #e04736;
+}  
+
+.issuance-form h2 span {
+  font-weight: 100;
+}
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+  }
+
+  .form-group label {
+    font-size: 15px;
+    font-weight:800;
+    color: #e04736;
+
+  }
+  
+  .form-group input {
+    padding: 10px;
+
+    border: none;
+    outline: none;
+    border: 2px solid lightcoral;
+  }
+
+  
+  .form-group select {
+    padding: 10px;
+
+    border: 2px solid lightcoral;
+  }
+  .submit-button {
+    padding: 0.5rem 1rem;
+    background-color:rgb(253, 76, 76);
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .submit-button:hover {
+    background-color: #e84012;
+  }
+  
