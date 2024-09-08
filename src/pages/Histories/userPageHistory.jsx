@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AdminHOC from '../../hoc/AdminHOC';
-import Table from '../../components/Table/table';
-import { fetchUserIssuanceDetails } from '../../api/services/issuancesApi'; 
+import Table from '../../components/table/table';
+import { fetchUserIssuanceDetails } from '../../api/services/actions/issuancesActions'; 
 import SearchIcon from "../../assets/icons/magnifying-glass.png";
 import LeftPageIcon from "../../assets/icons/LeftPage.png";
 import RightPageIcon from "../../assets/icons/Right-Page.png";
@@ -16,9 +16,7 @@ const History = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [issuances, setIssuances] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-
-  
+  const [searchTerm, setSearchTerm] = useState(""); 
   const columns = [
     { header: 'ID', accessor: 'id' },
     { header: 'Book', accessor: 'book' },

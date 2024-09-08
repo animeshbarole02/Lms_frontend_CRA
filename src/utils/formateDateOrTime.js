@@ -12,15 +12,22 @@ export const formatDateTime = (date) => {
   };
   
   
-  export const formatDateOrTime = (dateString, issuanceType) => {
-    const date = new Date(dateString);
-    if (issuanceType === "Home") {
+  export const formatDateOrTime = (date) => {
+    const d = new Date(date);
     
-      return date.toLocaleDateString();
-    } else if (issuanceType === "Library") {
-     
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }
-    return dateString;
-  };
+    const day = String(d.getDate()).padStart(2, '0'); 
+    const month = String(d.getMonth() + 1).padStart(2, '0'); 
+    const year = d.getFullYear();
+    
+    let hours = d.getHours();
+    const minutes = String(d.getMinutes()).padStart(2, '0'); 
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    
+    hours = hours % 12;
+    hours = hours ? hours : 12; // Adjust the hour '0' to '12'
   
+    const formattedDate = `${day}/${month}/${year}`;
+    const formattedTime = `${hours}:${minutes} ${ampm}`;
+  
+    return `${formattedDate}, ${formattedTime}`;
+  };

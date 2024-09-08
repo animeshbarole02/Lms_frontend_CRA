@@ -1,24 +1,22 @@
 
-import { get, post, del, patch } from "../apiClient";
-import { ISSUANCE_BASE_URL } from "../apiConstants";
-
-
-
-
+import { get, post, del, patch } from "../../apiServices";
+import { ISSUANCE_BASE_URL } from "../../apiConstants";
 
 export const fetchIssuances = async (page = 0, size = 10, searchTerm = "") => {
   try {
-    return await get(`${ISSUANCE_BASE_URL}/list`, {
+
+    const response =  await get(`${ISSUANCE_BASE_URL}/list`, {
       page,
       size,
       search: encodeURIComponent(searchTerm),
     });
+
+   return response;
   } catch (error) {
     console.error("Error fetching issuances:", error);
     throw error;
   }
 };
-
 
 export const createIssuance = async (issuance) => {
   try {
@@ -29,8 +27,7 @@ export const createIssuance = async (issuance) => {
 
     const response = await post(`${ISSUANCE_BASE_URL}/save`, issuance);
 
-    console.log("Response received:", response);
-
+    console.log(response);
     return response; 
   } catch (error) {
     console.error("Error in createIssuance function:", error);
@@ -45,9 +42,6 @@ export const updateIssuance = async (issuanceId, updatedData) => {
       `${ISSUANCE_BASE_URL}/update/${issuanceId}`,
       updatedData
     );
-
-    console.log("Response received:", response);
-
     return response; 
   } catch (error) {
     console.error("Error updating issuance:", error);
@@ -58,8 +52,8 @@ export const updateIssuance = async (issuanceId, updatedData) => {
 
 export const deleteIssuance = async (issuanceId) => {
   try {
-    await del(`${ISSUANCE_BASE_URL}/${issuanceId}`);
-    return true;
+   const response =  await del(`${ISSUANCE_BASE_URL}/${issuanceId}`);
+    return response;
   } catch (error) {
     console.error("Error deleting issuance:", error);
     throw error;
@@ -85,9 +79,7 @@ export const fetchUserIssuanceDetails = async (userId, page = 0, size = 10) => {
         page,
         size
       });
-  
-      console.log("Response received:", response);
-  
+
       return response; 
     } catch (error) {
       console.error("Error fetching user issuance details:", error);
@@ -103,11 +95,7 @@ export const fetchBookIssuanceDetails = async (bookId , page =0,size = 10) => {
             page,
             size
         })
-
-        console.log("Response received:", response);
-  
-        return response; 
-
+    return response; 
      }catch(error) {
         console.error("Error fetching user issuance details:",error);
         throw error ;

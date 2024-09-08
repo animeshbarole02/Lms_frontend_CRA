@@ -51,3 +51,34 @@
     align-items: center;
     padding: 5px;
 }
+
+@media (max-width: 768px) and (max-height: 1136px) {
+.sideBar-div {
+    width: 25vw; 
+    height: 100vh;
+    padding: 10px;
+    gap: 8%;
+}
+
+.dashboard-items-div {
+    margin-top: 30%; /* Adjust spacing for tablet */
+    height: 60vh; /* Adjust height */
+    gap: 20px; /* Reduce gap for better spacing */
+}
+
+.item {
+    border-radius: 8px;
+    padding: 2px; /* Increase padding for better touch interaction */
+    width: 15vw; /* Increase width of the items */
+    font-size: 16px; /* Adjust text size */
+}
+
+.item img {
+    height: 5vh; /* Adjust image size */
+}
+
+.item-text {
+    display: none;   
+}
+
+}

@@ -1,11 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+
 const initialState = {
   user: null,
   jwtToken: null,
   isAuthenticated: false,
   error: null,
 };
+
+
 
 const authSlice = createSlice({
   name: "auth",

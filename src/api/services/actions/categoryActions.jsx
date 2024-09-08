@@ -1,14 +1,16 @@
 // categoriesApi.js
-import { get, post, put, del } from "../apiClient";
-import { CATEGORY_BASE_URL } from "../apiConstants";
+import { get, post, put, del, patch } from "../../apiServices";
+import { CATEGORY_BASE_URL } from "../../apiConstants";
 
 
 
 
 export const fetchCategories = async (page = 0, size = 8, searchTerm = "") => {
   try {
+
+    const response = await get(`${CATEGORY_BASE_URL}/list`, { page, size, search: searchTerm });
     
-    return await get(`${CATEGORY_BASE_URL}/list`, { page, size, search: searchTerm }); // Removed encodeURIComponent as apiClient.js will handle query params encoding
+    return response;
   } catch (error) {
     console.error("Failed to Fetch Categories :", error);
     throw error; 
@@ -29,9 +31,10 @@ export const fetchCategoryCount= async () => {
 
 export const addCategory = async (newCategory) => {
   try {
-    console.log([newCategory]);
+    
+    const response = await post(`${CATEGORY_BASE_URL}/save`, newCategory);
  
-    return await post(`${CATEGORY_BASE_URL}/save`, [newCategory]);
+    return response;
   } catch (error) {
     console.error("Error in addCategory function:", error);
     throw error; 
@@ -41,8 +44,11 @@ export const addCategory = async (newCategory) => {
 
 export const deleteCategory = async (id) => {
   try {
+   
+    const response = await del(`${CATEGORY_BASE_URL}/${id}`);
     
-    return await del(`${CATEGORY_BASE_URL}/${id}`);
+  
+    return response;
   } catch (error) {
     console.error("Failed to delete category:", error);
     throw error; 
@@ -63,8 +69,8 @@ export const getCategoryByName = async (name) => {
 
 export const updateCategory = async (categoryId, updatedCategory) => {
   try {
-
-    return await put(`${CATEGORY_BASE_URL}/update/${categoryId}`, updatedCategory);
+     const response = await patch(`${CATEGORY_BASE_URL}/update/${categoryId}`, updatedCategory);
+    return response;
   } catch (error) {
     console.error("Error updating category:", error);
     throw error; 
@@ -75,7 +81,9 @@ export const updateCategory = async (categoryId, updatedCategory) => {
 export const fetchAllCategories = async () => {
   try {
 
-    return await get(`${CATEGORY_BASE_URL}/getAll`);
+    const response = await get(`${CATEGORY_BASE_URL}/getAll`);
+
+    return response;
   } catch (error) {
     console.error("Error fetching all categories:", error);
     throw error; 

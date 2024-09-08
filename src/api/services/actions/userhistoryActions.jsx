@@ -1,6 +1,6 @@
 // categoriesApi.js
-import { get } from "../apiClient";
-import { USER_HISTORY_BASE_URL } from "../apiConstants";
+import { get } from "../../apiServices";
+import { USER_HISTORY_BASE_URL } from "../../apiConstants";
 
 
 export const fetchUserHistoryDetails = async (userId, page = 0, size = 10) => {
@@ -11,7 +11,7 @@ export const fetchUserHistoryDetails = async (userId, page = 0, size = 10) => {
         size
       });
   
-      console.log("Response received:", response);
+
   
       return response; 
     } catch (error) {

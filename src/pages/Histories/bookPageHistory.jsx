@@ -1,8 +1,8 @@
 import React, { useEffect ,useState } from 'react'
 import AdminHOC from '../../hoc/AdminHOC'
-import Table from '../../components/Table/table';
+import Table from '../../components/table/table';
 import { formatDateOrTime } from '../../utils/formateDateOrTime';
-import { fetchBookIssuanceDetails } from '../../api/services/issuancesApi';
+import { fetchBookIssuanceDetails } from '../../api/services/actions/issuancesActions';
 import { useLocation } from 'react-router-dom';
 import LeftPageIcon from "../../assets/icons/LeftPage.png";
 import RightPageIcon from "../../assets/icons/Right-Page.png";
@@ -19,6 +19,17 @@ const BookHistory = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [issuances, setIssuances] = useState([]);
+  const columns = [
+    { header: 'ID', accessor: 'id', width: "2%" },
+    { header: 'Name', accessor: 'name',width:"3%" },
+    { header: 'Email', accessor: 'email' ,width:"3%"},
+    { header: 'Issued At', accessor: 'issuedAt',width:"3%" },
+    { header: 'Returned At', accessor: 'returnedAt',width:"3%" },
+    { header: 'Status', accessor: 'status',width:"3%" },
+    { header: 'Issuance Type', accessor: 'issuanceType',width:"3%" }
+  ];
+ 
+
 
     useEffect(() => {
         const loadIssuances = async () => {
@@ -40,7 +51,9 @@ const BookHistory = () => {
     
         loadIssuances();
       }, [currentPage, bookId]);
-    
+
+      
+      
      
      
       const handlePageChange = (newPage) => {
@@ -49,16 +62,6 @@ const BookHistory = () => {
         }
       };
 
-      const columns = [
-        { header: 'ID', accessor: 'id', width: "2%" },
-        { header: 'Name', accessor: 'name',width:"3%" },
-        { header: 'Email', accessor: 'email' ,width:"3%"},
-        { header: 'Issued At', accessor: 'issuedAt',width:"3%" },
-        { header: 'Returned At', accessor: 'returnedAt',width:"3%" },
-        { header: 'Status', accessor: 'status',width:"3%" },
-        { header: 'Issuance Type', accessor: 'issuanceType',width:"3%" }
-      ];
-     
 
   return (
     <div className='History-div'>

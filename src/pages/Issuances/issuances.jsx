@@ -1,6 +1,6 @@
 import  { useCallback, useEffect, useState } from "react";
 import SearchIcon from "../../assets/icons/magnifying-glass.png";
-import Table from "../../components/Table/table";
+import Table from "../../components/table/table";
 import Modal from "../../components/modal/modal";
 import Dynamicform from "../../components/forms/dynamicform";
 import LeftPageIcon from "../../assets/icons/LeftPage.png";
@@ -8,31 +8,59 @@ import RightPageIcon from "../../assets/icons/Right-Page.png";
 import AdminHOC from "../../hoc/AdminHOC";
 import {
   fetchIssuances,
- 
   deleteIssuance,
   updateIssuance,
-} from "../../api/services/issuancesApi";
+} from "../../api/services/actions/issuancesActions";
 import Tooltip from "../../components/tooltip/toolTip";
 import EditIcon from "../../assets/icons/EditIcom.png";
 import DeleteIcon from "../../assets/icons/DeleteIcon.png";
-import "./issuances.css"; 
 import { formatDateOrTime } from "../../utils/formateDateOrTime";
+import ConfirmationModal from "../../components/modal/confirmationModal";
+import Toast from "../../components/toast/toast";
+import debounce from "../../utils/debounce";
+import SearchInput from "../../components/search/search";
 
-const debounce = (func, delay) => {
-  let timer;
-  return function (...args) {
-    clearTimeout(timer);
-    timer = setTimeout(() => func.apply(this, args), delay);
-  };
-};
+
 
 const Issuances = () => {
+  const [showToast, setShowToast] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [issuances, setIssuances] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [editingIssuance, setEditingIssuance] = useState(null);
+  const [issuanceToDelete , setIssuanceToDelete]  = useState(null);
+  const [toast, setToast] = useState({ message: "", type: "success", isOpen: false });
+  const columns = [
+    { header: "Id", accessor: "displayId", width: "3%" },
+    { header: "User", accessor: "name", width: "8%" },
+    { header: "Book", accessor: "title", width: "10%" },
+    { header: "Issue", accessor: "issuedAt", 
+      
+      width: "8%",
+      render: (rowData) => formatDateOrTime(rowData.issuedAt) 
+     },
+     {header :"Return",accessor:"expectedReturn", width:"8%",
+      render: (rowData) => formatDateOrTime(rowData.expectedReturn) 
+     },
+    
+    { header: "Status", accessor: "status", width: "5%" },
+    {header : "Type" , accessor :"issuanceType",width : "5%"},
+    {
+      header: "Actions",
+      render: (rowData) => renderActions(rowData),
+      width: "5%",
+    },
+  ];
+
+  const todayDate = new Date().toISOString().split("T")[0];
+  const now = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000)
+  .toISOString()
+  .slice(0, 16);
+
+  
 
   const debounceSearch = useCallback(
     debounce((newSearchTerm) => {
@@ -46,9 +74,11 @@ const Issuances = () => {
   }, [currentPage]);
 
   
+
+  
   const loadIssuances = async (search = "") => {
     try {
-      const data = await fetchIssuances(currentPage, 10, search);
+      const data = await fetchIssuances(currentPage, 8, search);
       console.log(data);
      
       const transformedIssuances = data.content.map((issuance, index) => ({
@@ -76,18 +106,28 @@ const Issuances = () => {
   
 
   const handleDelete = async (rowData) => {
-    const id = rowData.id;
-    console.log(id);
+    if (!issuanceToDelete) return;
+    const id = issuanceToDelete.id;
     try {
-      await deleteIssuance(id);
+      const response = await deleteIssuance(id);
       
       setIssuances(issuances.filter((issuance) => issuance.id !== id));
-      return alert("Issuance Deleted Successfully");
+      setToast({ message: `${response}`, type: "success", isOpen: true });
+      setShowToast(true);
+      loadIssuances();
     } catch (error) {
       console.error("Failed to delete the issuance", error);
+    }finally {
+        setIssuanceToDelete(null);
+        setIsConfirmModalOpen(false);
     }
 
   
+  };
+
+  const handleCancelDelete = () => {
+    setIssuanceToDelete(null);
+    setIsConfirmModalOpen(false);
   };
 
   const formatDateTime = (date) => {
@@ -103,21 +143,17 @@ const Issuances = () => {
   };
 
   const handleEditIssuance = async (issuance) => {
+
     const formattedDate = formatDateTime(issuance.expectedReturn);
     const updatedIssuance = {
       ...issuance,
       expectedReturn: formattedDate,
     };
-
-    console.log(updatedIssuance);
   
     try {
-
-
-      await updateIssuance(updatedIssuance.id, updatedIssuance);
-
-     
-      alert("Issuance updated successfully");
+    const response =   await updateIssuance(updatedIssuance.id, updatedIssuance);
+    setToast({ message: `${response}`, type: "success", isOpen: true });
+    setShowToast(true);
       loadIssuances();
       handleCloseModal();
 
@@ -134,36 +170,11 @@ const Issuances = () => {
     }
   };
 
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
-  };
-
+ 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingIssuance(null);
   };
-
-  const columns = [
-    { header: "Id", accessor: "displayId", width: "3%" },
-    { header: "User", accessor: "name", width: "8%" },
-    { header: "Book", accessor: "title", width: "8%" },
-    { header: "Issue", accessor: "issuedAt", 
-      
-      width: "8%",
-      render: (rowData) => formatDateOrTime(rowData.issuedAt, rowData.issuanceType)
-     },
-     {header :"Return",accessor:"expectedReturn", width:"8%",
-      render: (rowData) => formatDateOrTime(rowData.expectedReturn, rowData.issuanceType)
-     },
-    
-    { header: "Status", accessor: "status", width: "5%" },
-    {header : "Type" , accessor :"issuanceType",width : "5%"},
-    {
-      header: "Actions",
-      render: (rowData) => renderActions(rowData),
-      width: "5%",
-    },
-  ];
 
   const renderActions = (rowData) => (
     <div className="actionicons">
@@ -180,16 +191,23 @@ const Issuances = () => {
           src={DeleteIcon}
           alt="Delete"
           className="action-icon"
-          onClick={() => handleDelete(rowData)}
+          onClick={() => handleOpenConfirmModal(rowData)}
         />
       </Tooltip>
     </div>
   );
 
   const handleEdit = (rowData) => {
+   
     setEditingIssuance(rowData);
     setIsModalOpen(true);
   };
+
+  const handleOpenConfirmModal = (rowData) => {
+     setIssuanceToDelete(rowData);
+    setIsConfirmModalOpen(true);
+  };
+
 
   return (
     <>
@@ -201,23 +219,11 @@ const Issuances = () => {
             </div>
 
             <div className="upper-div-btns">
-              <div className="upper-search-div">
-                <div className="search-input-div">
-                  <div className="search-icon-div">
-                    <img src={SearchIcon} alt="" />
-                  </div>
-
-                  <div className="search-categories-div">
-                    <input
-                      type="text"
-                      placeholder="Search issuances..."
-                      className="search-input"
-                      value={searchTerm}
-                      onChange={handleSearchInputChange}
-                    />
-                  </div>
-                </div>
-              </div>
+            <SearchInput
+        value={searchTerm}
+        onChange={handleSearchInputChange}
+        placeholder="Search Issuances..."
+      />
 
             
             </div>
@@ -255,8 +261,9 @@ const Issuances = () => {
         </div>
       </div>
       {/* Modal Component */}
-
+     
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+        
         <Dynamicform 
           
           heading={editingIssuance ?"Edit Issuance":"Add Issuance"}
@@ -264,15 +271,19 @@ const Issuances = () => {
             {
                name :"expectedReturn",
                type:"datetime-local",
-               placeholder :"Return Time"
-
+               placeholder :"Return Time",
+               min: now,
               
             },
             {
-              name :"status",
-              type :"text",
-              placeholder:"Status"
-            },
+                name: "status",
+                type: "select", 
+                placeholder: "Select Status",
+                options: [
+                  { value: "Issued", label: "Issued" },  
+                  { value: "Returned", label: "Returned" }  
+                ]
+              },
           ]}
 
           onSubmit={handleEditIssuance}
@@ -284,6 +295,18 @@ const Issuances = () => {
 
        
       </Modal>
+      <ConfirmationModal
+        isOpen={isConfirmModalOpen}
+        onClose={handleCancelDelete}
+        onConfirm={handleDelete}
+        message="Are you sure you want to delete this user?"
+      />
+      <Toast 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={() => setShowToast(false)} 
+          isOpen={showToast}
+   />
      
     </>
   );

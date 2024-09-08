@@ -1,6 +1,6 @@
-import Table from "../../components/Table/table";
+import Table from "../../components/table/table";
 import { useState, useCallback, useEffect } from "react";
-import Button from "../../components/Button/button";
+import Button from "../../components/button/button";
 import SearchIcon from "../../assets/icons/magnifying-glass.png";
 import LeftPageIcon from "../../assets/icons/LeftPage.png";
 import RightPageIcon from "../../assets/icons/Right-Page.png";
@@ -15,24 +15,25 @@ import {
   createBook,
   deleteBook,
   updateBook,
-} from "../../api/services/bookApi";
-import { fetchAllCategories, getCategoryByName } from "../../api/services/categoryApi";
+} from "../../api/services/actions/bookActions";
+import { fetchAllCategories} from "../../api/services/actions/categoryActions";
 import Tooltip from "../../components/tooltip/toolTip";
 
 import "./books.css";
 import IssuanceForm from "../../components/forms/issuancesform";
-import { createIssuance } from "../../api/services/issuancesApi";
+import { createIssuance } from "../../api/services/actions/issuancesActions";
 import { Navigate, useNavigate } from "react-router-dom";
+import Toast from "../../components/toast/toast";
+import ConfirmationModal from "../../components/modal/confirmationModal";
+import debounce from "../../utils/debounce";
+import SearchInput from "../../components/search/search";
 
-const debounce = (func, delay) => {
-  let timer;
-  return function (...args) {
-    clearTimeout(timer);
-    timer = setTimeout(() => func.apply(this, args), delay);
-  };
-};
 
 const Books = () => {
+
+  const navigate = useNavigate();
+
+  const [showToast, setShowToast] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [books, setBooks] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
@@ -42,10 +43,50 @@ const Books = () => {
   const [categories, setCategories] = useState([]);
   const [isIssuanceModalOpen, setIsIssuanceModalOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState(null);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false); // Add state for confirm modal
+  const [bookToDelete, setBookToDelete] = useState(null); // Add state for book to delete
+  const [toast, setToast] = useState({ message: "", type: "success", isOpen: false });
+  const [errors,setErrors] = useState({ title: "", author:"", categoryId:"",quantity: ""});
+  const [rowsPerPage, setRowsPerPage] = useState(window.innerWidth <= 768 ? 15 : 9);
+
+  const columns = [
+    { header: "ID", accessor: "displayId", 
+      width: "5%" },
+    { header: "Title", accessor: "title", width: "10%" },
+    { header: "Author", accessor: "author", width: "8%" },
+    { header: "Category", accessor: "categoryName", width: "6%" },
+    { header: "Quantity", accessor: "quantity", width: "0%" },
+
+    {
+      header: "Options",
+      render: (rowData) => (
+        <div className="button-container">
+          <Button
+            text="Issue"
+            className="action-button issue-button"
+            onClick={() => handleIssue(rowData)}
+           
+          />
+          <Button
+            text="History"
+            className="action-button issue-button"
+            onClick={() => handleHistory(rowData)}
+          />
+        </div>
+      ),
+      width: "2%",
+    },
+    {
+      header: "Actions",
+      render: (rowData) => renderActions(rowData),
+      width: "1%",
+    },
+    
+  ];
 
 
 
-  const navigate = useNavigate();
+  
 
 
   const debounceSearch = useCallback(
@@ -55,21 +96,38 @@ const Books = () => {
     []
   );
 
+ 
+
   useEffect(() => {
     loadBooks();
     fetchCategories();
+
+    const handleResize = () => {
+      setRowsPerPage(window.innerWidth <= 768 ? 16 : 9);
+    };
+  
+    window.addEventListener("resize", handleResize);
+    
+    // Initial call to set rowsPerPage correctly
+    handleResize();
+  
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+   
+  
   }, [currentPage]);
 
   const loadBooks = async (search = "") => {
     try {
-      const data = await fetchBooks(currentPage, 10, search);
+      const data = await fetchBooks(currentPage, rowsPerPage, search);
 
      
 
       const startIndex = currentPage * data.size;
       const transformedBooks = data.content.map((book, index) => ({
         ...book,
-     
+        displayId: startIndex + index + 1,
         categoryName: book.category.name,
       }));
       setBooks(transformedBooks);
@@ -90,72 +148,94 @@ const fetchCategories = async () => {
 
  
 
-  const handleAddBook = async (newBook) => {
+const handleAddBook = async (newBook) => {
+ 
 
-    
+  let hadError = false;
 
-    console.log(newBook);
 
-    if (
-      newBook.title &&
-      newBook.author &&
-      newBook.categoryId &&
-      newBook.quantity
-    ) {
+  setErrors({ title: "", author: "", categoryId: "", quantity: "" });
 
-      
-  
-    
-        const bookToCreate = {
-          title: newBook.title,
-          author: newBook.author,
-          categoryId : newBook.categoryId,
-          quantity: parseInt(newBook.quantity),
-        };
-    
 
-        console.log(bookToCreate);
-         try {
-          if(editingBook) {
-            await updateBook(newBook.id, {...bookToCreate})
-            setEditingBook(null);
-          }else {
-            await createBook(bookToCreate);
-            
-          }
-         
-   
-      
-          loadBooks();
-       
-        handleCloseModal();
-      } catch (error) {
-        console.error("Failed to add book:", error);
-      }
-    }
+  const title = newBook.title ? newBook.title.trim() : "";
+  const author = newBook.author ? newBook.author.trim() : "";
+  const categoryId = newBook.categoryId || "";
+  const quantity = newBook.quantity ? parseInt(newBook.quantity) : null;
+
+  if (!title) {
+    setErrors((prevErrors) => ({ ...prevErrors, title: "Book title is required." }));
+    hadError = true;
+  }
+  if (!author) {
+    setErrors((prevErrors) => ({ ...prevErrors, author: "Author name is required." }));
+    hadError = true;
+  }
+  if (!categoryId) {
+    setErrors((prevErrors) => ({ ...prevErrors, categoryId: "Category is required." }));
+    hadError = true;
+  }
+  if (quantity === null || isNaN(quantity) || quantity <= 0) {
+    setErrors((prevErrors) => ({ ...prevErrors, quantity: "Quantity must be a positive number." }));
+    hadError = true;
+  }
+
+  if (hadError) {
+    return; 
+  }
+
+  const bookToCreate = {
+    title: newBook.title.trim(),
+    author: newBook.author.trim(),
+    categoryId: newBook.categoryId,
+    quantity: parseInt(newBook.quantity),
   };
-  const handleDelete = async (rowData) => {
-    const id = rowData.id;
+
+  try {
+    if (editingBook) {
+      await updateBook(newBook.id, { ...bookToCreate });
+      setEditingBook(null);
+      setToast({ message: `Book Updated: ${editingBook.title}`, type: "success", isOpen: true });
+    } else {
+      await createBook(bookToCreate);
+      setToast({ message: `Book added: ${bookToCreate.title}`, type: "success", isOpen: true });
+    }
+
+    setShowToast(true);
+    loadBooks();
+    handleCloseModal();
+  } catch (error) {
+    console.error("Failed to add book:", error);
+   
+   
+  }
+};
+
+  const handleDelete = async () => {
+    if (!bookToDelete) return;
+  
+    const id = bookToDelete.id;
   
     try {
       const message = await deleteBook(id);
   
       if (message === "Book deleted successfully") {
-        setBooks(books.filter((book) => book.id !== id));
-        alert(message);
-      } else if (message === "Book cannot be deleted as it is currently issued.") {
-        alert(message);
-      } else if (message === "Book not found") {
-        alert(message);
+        setToast({ message: "Book deleted successfully.", type: "success", isOpen: true });
+        setShowToast(true);
+        loadBooks();
       } else {
-        alert("An unexpected error occurred.");
+        setToast({ message: message, type: "error", isOpen: true });
+        setShowToast(true);
       }
   
     } catch (error) {
       console.error("Failed to delete the book", error);
       alert("Failed to delete the book due to a server error.");
+    } finally {
+      setBookToDelete(null);
+      setIsConfirmModalOpen(false);
     }
   };
+  
 
   const handleSearchInputChange = (event) => {
     const newSearchTerm = event.target.value;
@@ -169,6 +249,15 @@ const fetchCategories = async () => {
     } else if (direction === "next" && currentPage < totalPages - 1) {
       setCurrentPage(currentPage + 1);
     }
+  };
+  const handleCancelDelete = () => {
+    setBookToDelete(null);
+    setIsConfirmModalOpen(false);
+  };
+
+  const handleOpenConfirmModal = (rowData) => {
+    setBookToDelete(rowData);
+    setIsConfirmModalOpen(true);
   };
 
   const handleOpenModal = () => {
@@ -191,38 +280,7 @@ const fetchCategories = async () => {
     
   }
 
-  const columns = [
-    { header: "ID", accessor: "id", width: "5%" },
-    { header: "Title", accessor: "title", width: "10%" },
-    { header: "Author", accessor: "author", width: "10%" },
-    { header: "Category", accessor: "categoryName", width: "5%" },
-    { header: "Quantity", accessor: "quantity", width: "0%" },
-
-    {
-      header: "Options",
-      render: (rowData) => (
-        <div className="button-container">
-          <Button
-            text="Issue"
-            className="action-button issue-button"
-            onClick={() => handleIssue(rowData)}
-          />
-          <Button
-            text="History"
-            className="action-button issue-button"
-            onClick={() => handleHistory(rowData)}
-          />
-        </div>
-      ),
-      width: "2%",
-    },
-    {
-      header: "Actions",
-      render: (rowData) => renderActions(rowData),
-      width: "1%",
-    },
-    
-  ];
+ 
 
   const handleIssuanceSubmit = async (issuanceDetails) => {
    
@@ -230,19 +288,17 @@ const fetchCategories = async () => {
 
         console.log(issuanceDetails);
        const response = await createIssuance(issuanceDetails);
-
-       console.log(response);
-       
-
-      if (response === "Issuance already exists for this user and book.") {
-          alert(response); 
-      } 
-      else if (response==="No copies available for the selected book."){
-             alert(response);
+     console.log(response);
+      if(response==="Issuance Added Successfully"){
+       setToast({ message:response, type: "success", isOpen: true });
+       setShowToast(true);
       }
-      else {
-          alert("Issuance created successfully.");
-      }
+       else {
+
+        setToast({ message:response, type: "error", isOpen: true });
+        setShowToast(true);
+        
+       }
       loadBooks();
   } catch (error) {
       console.error("Failed to create issuance:", error);
@@ -261,9 +317,11 @@ const fetchCategories = async () => {
 
 
 
+
+
   const handleEdit = (rowData) => {
 
-   
+    console.log(rowData.category.id)
     setEditingBook(rowData)
     setIsModalOpen(true);
      
@@ -289,7 +347,7 @@ const fetchCategories = async () => {
           src={DeleteIcon}
           alt="Delete"
           className="action-icon"
-          onClick={() => handleDelete(rowData)}
+          onClick={() => handleOpenConfirmModal(rowData)}
         />
       </Tooltip>
     </div>
@@ -299,6 +357,7 @@ const fetchCategories = async () => {
 
   return (
     <>
+    <div className="bookspage-div">
       <div className="center-div">
         <div className="upper-div">
           <div className="upper-div-text">
@@ -307,21 +366,13 @@ const fetchCategories = async () => {
 
           <div className="upper-div-btns">
             <div className="upper-search-div">
-              <div className="search-input-div">
-                <div className="search-icon-div">
-                  <img src={SearchIcon} alt="" />
-                </div>
 
-                <div className="search-categories-div">
-                  <input
-                    type="text"
-                    placeholder="Search Books..."
-                    className="search-input"
-                    value={searchTerm}
-                    onChange={handleSearchInputChange}
-                  />
-                </div>
-              </div>
+            <SearchInput
+        value={searchTerm}
+        onChange={handleSearchInputChange}
+        placeholder="Search Books..."
+      />
+         
             </div>
 
             <div className="add-categories-div">
@@ -374,21 +425,21 @@ const fetchCategories = async () => {
               name: "title",
               type: "text",
               placeholder: "Book Title",
-              required: true,
+             
             
             },
             {
               name: "author",
               type: "text",
               placeholder: "Author Name",
-              required: true,
+             
              
             },
             {
               name: "categoryId",
               type: "select", 
               placeholder: "Select Book Category",
-              required: true,
+             
               options: categories.map((category) => ({
                 value: category.id,
                 label: category.name,
@@ -398,12 +449,13 @@ const fetchCategories = async () => {
               name: "quantity",
               type: "number",
               placeholder: "Enter Quantity",
-              required: true,
+             
             },
           ]}
           onSubmit={handleAddBook}
-          isEditMode={!!editingBook}
+          isEditMode={editingBook}
           initialData={editingBook||{}}
+          errors={errors}
           
         />
       </Modal>
@@ -413,12 +465,26 @@ const fetchCategories = async () => {
         <IssuanceForm
           onSubmit={handleIssuanceSubmit}
           selectedBook={selectedBook}
+        
           onClose={() => setIsIssuanceModalOpen(false)}
         />
       </Modal>
 
+      <ConfirmationModal
+        isOpen={isConfirmModalOpen}
+        onClose={handleCancelDelete}
+        onConfirm={handleDelete}
+        message="Are you sure you want to delete this Book?"
+      />
 
-  
+
+      <Toast
+     message={toast.message} 
+     type={toast.type} 
+     onClose={() => setShowToast(false)} 
+     isOpen={showToast}
+   />
+   </div>
 
     </>
   );

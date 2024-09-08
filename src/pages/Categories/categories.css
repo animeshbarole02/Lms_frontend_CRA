@@ -177,11 +177,148 @@
     cursor: pointer;
   }
 
-  .right-pagination img :hover {
-
-  }
- 
 
   .pagination-number span {
     font-size: 20px;
   }
+
+ 
+
+  @media screen and (max-width: 768px) {
+    .action-icon {
+        height: 3vh;  /* Make the icon smaller */
+    }
+
+    .actionicons {
+      display: flex;
+      justify-content: center;
+      gap:5px
+    }
+
+    .center-div {
+
+
+      width: 78vw;
+      position: relative;
+    
+      
+      left: 25%;
+    
+      height: 80vh;
+      padding-top: 18%;
+   
+   
+   
+  }
+
+  .upper-div {
+    display: flex;
+    justify-content: space-between;
+  
+    
+    
+    
+}
+
+.upper-div-btns {
+   
+    display: flex;
+    gap: 10px;
+} 
+
+.lower-div {
+   
+    justify-content: center;
+    
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+   
+    
+
+  
+    
+    
+}
+
+
+
+
+
+.search-input-div {
+    display: flex;
+    border: 1.0px solid #fa604f; ;
+    height: 4.0vh;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+    width: 20vw;
+   
+    
+  
+   
+    
+}
+
+.search-categories-div .search-input {
+  width: 10vw;
+  height: vh;
+  border: none;
+  outline: none;
+  margin-right: 5px;
+}
+
+
+
+.search-icon-div {
+    
+    margin: 0px 10px 0px 10px;
+    
+  
+
+}
+.search-icon-div img{
+
+    height: 1.5vh;
+
+   
+
+}
+
+.add-categories-div button {
+  padding: 2px;
+  font-size: 15px;
+  background-color: white;
+ 
+}
+
+
+.add-categories-div .add-categories-btn
+{
+   width: 15vw;
+   height: 4vh;
+   border: 1px solid  #ec6657;
+}
+
+.center-div .upper-div-text {
+    
+
+  width: 10vw;
+  background-color: #ffffff;
+  color: black;
+  font-size: 22px;
+  font-weight: 250;
+ 
+  margin-bottom: 2%;
+}
+ .issue-button {
+   width: 8vw;
+   font-size: 12px;
+  }
+
+  .history-button {
+    width: 8vw;
+    font-size: 12px;
+  }
+
+}

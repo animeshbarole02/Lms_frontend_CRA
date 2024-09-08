@@ -1,11 +1,11 @@
 import "./App.css";
-import Books from "./pages/Books/books";
-import Categories from "./pages/Categories/categories";
-import Dashboard from "./pages/Dashboard/dashboard";
-import Login from "./pages/Login/login";
-import Users from "./pages/Users/users";
+import Books from "./pages/books/books";
+import Categories from "./pages/categories/categories";
+import Dashboard from "./pages/dashboard/dashboard";
+import Login from "./pages/login/login";
+import Users from "./pages/users/users";
 import Issuances from "./pages/Issuances/issuances";
-import UserHistory from "./pages/UserHistory/userHistory";
+import UserHistory from "./pages/userHistory/userHistory";
 import { Route, Routes, BrowserRouter, Navigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -18,8 +18,9 @@ import {
   loginSuccess,
   logout,
 } from "./redux/authSlice"; 
-import History from "./pages/Histories/userPageHistory";
-import BookHistory from "./pages/Histories/bookPageHistory";
+import History from "./pages/histories/userPageHistory";
+import BookHistory from "./pages/histories/bookPageHistory";
+import { BASE_URL, CURRENT_USER } from "./api/apiConstants";
 
 
 
@@ -38,8 +39,9 @@ function App() {
   }, [dispatch]);
 
   const fetchUserInfo = async (token) => {
+  
     try {
-      const response = await fetch("http://localhost:8080/api/v1/currentUser", {
+      const response = await fetch(`${BASE_URL}${CURRENT_USER}`,{
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -112,6 +114,15 @@ function App() {
                 </ProtectedRoute>
               }
           />
+
+           <Route
+            path="/bookHistory"
+            element={
+              <ProtectedRoute allowedRoles={["ADMIN"]}>
+                <BookHistory />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/userHistory"
             element={
@@ -120,14 +131,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-            <Route
-            path="//bookHistory"
-            element={
-              <ProtectedRoute allowedRoles={["USER"]}>
-                <BookHistory />
-              </ProtectedRoute>
-            }
-          />
+           
 
              <Route
             path="*"

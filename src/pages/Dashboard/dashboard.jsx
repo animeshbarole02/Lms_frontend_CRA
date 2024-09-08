@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from "react";
 import "./dashboard.css";
-import Navbar from "../../components/Navbar/navbar";
-import SideBar from "../../components/SideBar/sideBar";
-import Card from "../../components/Card/card";
+import Navbar from "../../components/navbar/navbar";
+import SideBar from "../../components/sideBar/sideBar";
+import Card from "../../components/card/card";
 
 import Reading from "../../assets/icons/girl-reading-book.png";
 import Books from "../../assets/icons/Books.png";
 import TakeAway from "../../assets/icons/Categories1.png";
 import TotalUsers from "../../assets/icons/TotalUsers.png";
 import AdminHOC from "../../hoc/AdminHOC";
-import { fetchUserCount } from "../../api/services/usersApi";
-import { fetchCategoryCount } from "../../api/services/categoryApi";
-import { fetchBooks, fetchTotalBookCount } from "../../api/services/bookApi";
-import { fetchIssuanceCount } from "../../api/services/issuancesApi";
-import Table from "../../components/Table/table";
+import { fetchUserCount } from "../../api/services/actions/usersActions";
+import { fetchCategoryCount } from "../../api/services/actions/categoryActions";
+import { fetchBooks, fetchTotalBookCount } from "../../api/services/actions/bookActions";
+import { fetchIssuanceCount } from "../../api/services/actions/issuancesActions";
+import Table from "../../components/table/table";
 import { current } from "@reduxjs/toolkit";
 
 const Dashboard = () => {
@@ -24,7 +24,20 @@ const Dashboard = () => {
   const [issuanceCount, setIssuanceCount] = useState(0);
   const [tableData, setTableData] = useState([]);
 
+  const [isTabletView, setIsTabletView] = useState(window.innerWidth <= 768);
+
   useEffect(() => {
+    const handleResize = () => setIsTabletView(window.innerWidth <= 768);
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+
+ 
+  useEffect(() => {
+
+    
     const getCounts = async () => {
       try {
         const userCount = await fetchUserCount();
@@ -39,13 +52,13 @@ const Dashboard = () => {
         const categoryCount = await fetchCategoryCount();
         setCategoryCount(categoryCount);
 
-        const booksTable = await fetchBooks(0, 5, "");
+        const booksTable = await fetchBooks(0, 10, "");
         const transformedTable = booksTable.content.map((book, index) => ({
           ...book,
           id: index + 1,
         }));
         setTableData(transformedTable);
-        console.log(transformedTable);
+        
       } catch (error) {
         console.error("Error fetching counts:", error);
       }
@@ -54,9 +67,7 @@ const Dashboard = () => {
     getCounts();
   }, []);
 
-  const handleClick = (cardType) => {
-    console.log(`${cardType} card clicked`);
-  };
+
 
   const columns = [
     { header: "ID", accessor: "id", width: "2%" },
@@ -107,32 +118,16 @@ const Dashboard = () => {
         </div>
 
         <div className="rightdash-div">
-          <div className="rightdash-table">
-            <div className="dashborad-table-heading">
-              <p>Top Books</p>
+          {!isTabletView && (
+            <div className="rightdash-table">
+              <div className="dashborad-table-heading">
+                <p>Top Books</p>
+              </div>
+              <div className="dashboard-table">
+                <Table data={tableData} columns={columns} />
+              </div>
             </div>
-            <div className="dashboard-table">
-              <Table data={tableData} columns={columns} />
-            </div>
-          </div>
-
-          {/* <div className="rightdashcard">
-            <div className="right-card-div">
-              <Card
-                className="books-right-card"
-                heading="Books Available"
-                count={bookCount}
-              />
-            </div>
-
-            <div className="right-card-div">
-              <Card
-                className="books-right-card"
-                heading="Books Available"
-                count={bookCount}
-              />
-            </div>
-          </div> */}
+          )}
         </div>
       </div>
     </div>

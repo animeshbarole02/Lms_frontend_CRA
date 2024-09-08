@@ -1,12 +1,9 @@
-
-
-.dashboard-div {
-
-
+   
+   .dashboard-div {
     
-    }
-    
-    .leftdash-div {
+   }
+   
+   .leftdash-div {
        position: relative;
        padding: 1% 2% 0px 1%;
       
@@ -16,42 +13,32 @@
         display: flex;
         justify-content: center;
         align-items: center;
-       
-        
         height: 100vh;
-    
         margin-left: 10%;
-        
-    }
+     }
     
     .dashboard-div .contains .card-table-div {
 
         position: relative;
         top: 3%;
-       
     }
+
     .rightdash-table {
         height: 68vh;
     }
     
     .rightdash-div {
-        
-       
         position: relative;
         left: 3%;
         bottom: 1%;
         display: flex;
-        flex-direction: column;
-        
-        
-       
+        flex-direction: column;     
     }
 
 
 
     .rightdashcard {
         display: flex;
-        
     }
     .heading h2 {
        color:  #ffa33a; 
@@ -72,41 +59,23 @@
     .dashborad-table-heading{
           
         font-size: 30px;
-       
-      
-       
-    }
-    
- 
-    
-    
-    
-    
+     }
+   
     .cards-div {
-         
-      
-         display: grid;
         
-         grid-template-columns:  auto 1fr;;
-        
-         width: 100%;
-        
-     
-         
-         margin-right: 30px; 
-         place-self: center;
-         gap: 10px;
+        display: grid;
+        grid-template-columns:  auto 1fr;
+        width: 100%;
+        margin-right: 30px; 
+        place-self: center;
+        gap: 10px;
     
     
     }
     
     .cards-div .card-div:nth-child(1)  img{
-      
-    
        position: relative;
        bottom:4.5%;
-        
-        
     }
     
     .cards-div .card-div:nth-child(3),
@@ -128,9 +97,7 @@
     
     .card-div {
         place-self: center;
-        margin:10%;
-        
-        
+        margin:10%;   
     }
     
 
@@ -139,10 +106,32 @@
         height: 60vh;
         margin-top: 2%;
     }
-    /**
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    margin-left: 20%;
-    **/
+   
+
+
+
+    @media (max-width: 768px) { 
+       
+
+        .dashboard-div .contains .card-table-div {
+            position: relative;
+            top: 5%;
+            left: 10%;
+
+    }
+
+    .cards-div .card-div:nth-child(4) img {
+        width: 12vw;
+        margin-top: 25%;
+    }
+
+    .cards-div .card-div:nth-child(2)  img{
+        position: relative;
+        bottom:10%;
+     }
+     .rightdash-table {
+       display: none;
+    }
+     
+
+}

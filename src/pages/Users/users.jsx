@@ -2,8 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 
 import EditIcon from "../../assets/icons/EditIcom.png";
 import SearchIcon from "../../assets/icons/magnifying-glass.png";
-import Button from "../../components/Button/button";
-import Table from "../../components/Table/table";
+import Button from "../../components/button/button";
+import Table from "../../components/table/table";
 import LeftPageIcon from "../../assets/icons/LeftPage.png";
 import RightPageIcon from "../../assets/icons/Right-Page.png";
 import AdminHOC from "../../hoc/AdminHOC";
@@ -16,22 +16,22 @@ import {
   deleteUser,
   fetchUsers,
   updateUser,
-} from "../../api/services/usersApi";
+} from "../../api/services/actions/usersActions";
 import UserIssuanceform from "../../components/forms/userIssuanceform";
-import { createIssuance } from "../../api/services/issuancesApi";
+import { createIssuance } from "../../api/services/actions/issuancesActions";
 
 import { generatePassword } from "../../utils/generatePassword";
 import { Navigate, useNavigate } from "react-router-dom";
+import ConfirmationModal from "../../components/modal/confirmationModal";
+import Tooltip from "../../components/tooltip/toolTip";
+import Toast from "../../components/toast/toast";
+import debounce from "../../utils/debounce";
+import SearchInput from "../../components/search/search";
 
-const debounce = (func, delay) => {
-  let timer;
-  return function (...args) {
-    clearTimeout(timer);
-    timer = setTimeout(() => func.apply(this, args), delay);
-  };
-};
+
 
 const Users = () => {
+  const [showToast, setShowToast] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [users, setUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
@@ -41,121 +41,13 @@ const Users = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [editUser, setEditUser] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
-
-
-  const navigate = useNavigate();
-
-  const debounceSearch = useCallback(
-    debounce((newSearchTerm) => {
-      loadUsers(newSearchTerm);
-    }, 1000),
-    []
-  );
-
-  useEffect(() => {
-    loadUsers(searchTerm);
-  }, [currentPage]);
-
-  const loadUsers = async (search = "") => {
-    try {
-      const data = await fetchUsers(currentPage, 7, search);
-
-      
-      const transformedCategories = data.content.map((user, index) => ({
-        ...user,
-       
-      }));
-
-      console.log(data);
-      setUsers(transformedCategories);
-      setTotalPages(data.totalPages);
-    } catch (error) {
-      console.error("Failed to load Users:", error);
-    }
-  };
-
-  const handleOpenModal = () => {
-    setIsEditMode(false); 
-    setEditUser(null); 
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleAddUser = async (user) => {
-    const newUser = {
-      ...user,
-      role: "USER",
-      password : generatePassword(12)
-    };
-
-     console.log(newUser);
-
-    try {
-      if (isEditMode && editUser) {
-       
-
-        console.log(editUser.id, newUser);
-        const responseMessage = await updateUser(editUser.id, newUser);
-        alert(responseMessage);
-      } else {
-      
-        await addUser(newUser);
-        alert("User added successfully.");
-      }
-
-      loadUsers();
-      handleCloseModal();
-    } catch (error) {
-      console.error("Failed to save User:", error);
-      alert("Failed to save User. Please try again.");
-    }
-  };
-
-  const handleDelete = async (rowData) => {
-    const id = rowData.id;
-
-    try {
-      await deleteUser(id);
-      setUsers(users.filter((user) => user.id !== id));
-    } catch (error) {
-      console.log("Failed to delete User", error);
-    }
-  };
-
-  const handleIssue = (rowData) => {
-    setSelectedUser(rowData);
-    setIsIssuanceModalOpen(true);
-  };
-
-  const handleHistory = (rowData) => {
-
-    console.log(rowData);
-
-    navigate('/history', { state: { userId: rowData.id ,
-        userName : rowData.name
-     } });
-      
-  };
-
-  const handleSearchInputChange = (event) => {
-    const newSearchTerm = event.target.value;
-    setSearchTerm(newSearchTerm);
-    debounceSearch(newSearchTerm);
-  };
-
-  const handlePageChange = (direction) => {
-    if (direction === "prev" && currentPage > 0) {
-      setCurrentPage(currentPage - 1);
-    } else if (direction === "next" && currentPage < totalPages - 1) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
+  const [toast, setToast] = useState({ message: "", type: "success", isOpen: false });
+  const[errors , setErrors] = useState({name :"",email :"",phoneNumber: ""});
 
   const columns = [
-    { header: "ID", accessor: "id", width: "2%" },
+    { header: "ID", accessor: "displayId", width: "2%" },
     { header: "User Name", accessor: "name", width: "3%" },
     { header: "User Email", accessor: "email", width: "5%" },
     { header: "Phone Number", accessor: "phoneNumber", width: "4%" }, 
@@ -184,22 +76,179 @@ const Users = () => {
     },
   ];
 
+
+
+  const navigate = useNavigate();
+
+  const debounceSearch = useCallback(
+    debounce((newSearchTerm) => {
+      loadUsers(newSearchTerm);
+    }, 1000),
+    []
+  );
+
+  useEffect(() => {
+    loadUsers(searchTerm);
+  }, [currentPage]);
+
+  const loadUsers = async (search = "") => {
+    try {
+      const data = await fetchUsers(currentPage, 7, search);
+
+      
+      const startIndex = currentPage * data.size;
+      const transformedCategories = data.content.map((user, index) => ({
+        ...user,
+       displayId : startIndex + index + 1,
+      }));
+      setUsers(transformedCategories);
+      setTotalPages(data.totalPages);
+    } catch (error) {
+      console.error("Failed to load Users:", error);
+    }
+  };
+
+  const handleOpenModal = () => {
+    setIsEditMode(false); 
+    setEditUser(null); 
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditUser(null)
+  };
+
+  const handleAddUser = async (user) => {
+
+    let hasError = false;
+    const name = user.name ? user.name.trim() : "";
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const email = user.email ? emailPattern.test(user.email) : "";
+    const phonePattern = /^\d{10}$/;
+    const phoneNumber = user.phoneNumber ? phonePattern.test(user.phoneNumber) : "";
+    
+    if(!name) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        name : "Enter a Name",
+      }))
+      hasError = true;
+    }
+  
+    const newUser = {
+      ...user,
+      role: "USER",
+      password: generatePassword(12), 
+    };
+  
+    try {
+      if (isEditMode && editUser) {
+      
+        const responseMessage = await updateUser(editUser.id, newUser);
+        setToast({ message: "User updated successfully", type: "success", isOpen: true });
+        setShowToast(true);
+      } else {
+        // Add new user
+        await addUser(newUser);
+        setToast({ message: "User added successfully.", type: "success", isOpen: true });
+        setShowToast(true);
+      }
+  
+      loadUsers(); 
+      handleCloseModal(); 
+    } catch (error) {
+      console.error("Failed to save User:", error);
+    
+    }
+  };
+  const handleOpenConfirmModal = (rowData) => {
+    setUserToDelete(rowData);
+    setIsConfirmModalOpen(true);
+  };
+
+
+
+const handleDelete = async () => {
+
+  
+  if (!userToDelete) return;
+    const id = userToDelete.id;
+  try {
+    const response = await deleteUser(id); 
+
+    if (response === "User deleted successfully") {
+      setUsers(users.filter((user) => user.id !== id)); 
+      setToast({ message: response, type: "success", isOpen: true });
+    } else {
+      setToast({ message: response, type: "error", isOpen: true }); 
+    
+    setShowToast(true);
+    loadUsers();
+  } 
+}catch (error) {
+    console.log("Failed to delete User", error); 
+  } finally {
+    setUserToDelete(null);
+    setIsConfirmModalOpen(false); 
+  }
+};
+
+
+  const handleCancelDelete = () => {
+    setUserToDelete(null);
+    setIsConfirmModalOpen(false);
+  };
+
+
+  const handleIssue = (rowData) => {
+    setSelectedUser(rowData);
+    setIsIssuanceModalOpen(true);
+  };
+
+  const handleHistory = (rowData) => {
+    navigate('/history', { state: { userId: rowData.id ,
+        userName : rowData.name
+     } });
+      
+  };
+
+  const handleSearchInputChange = (event) => {
+    const newSearchTerm = event.target.value;
+    setSearchTerm(newSearchTerm);
+    debounceSearch(newSearchTerm);
+  };
+
+  const handlePageChange = (direction) => {
+    if (direction === "prev" && currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    } else if (direction === "next" && currentPage < totalPages - 1) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+ 
+
   const handleIssuanceSubmit = async (issuanceDetails) => {
  
     try {
       const response = await createIssuance(issuanceDetails);
+      
+     
+      
+     console.log(response);
+      if(response==="Issuance Added Successfully"){
+       setToast({ message:response, type: "success", isOpen: true });
+       setShowToast(true);
+      }
+       else {
 
-      console.log(response);
-
-      if (response === "Issuance already exists for this user and book.") {
-        alert(response);
-      }
-      else if (response==="No copies available for the selected book."){
-        alert(response);
-      }
-      else {
-        alert("Issuance created successfully.");
-      }
+        setToast({ message:response, type: "error", isOpen: true });
+        setShowToast(true);
+        
+       }
+      loadUsers();
+      
     } catch (error) {
       console.error("Failed to create issuance:", error);
       alert("Failed to create issuance.");
@@ -214,18 +263,22 @@ const Users = () => {
 
   const renderActions = (rowData) => (
     <div className="actionicons">
+        <Tooltip message="Edit">
       <img
         src={EditIcon}
         alt="Edit"
         className="action-icon"
         onClick={() => handleEdit(rowData)}
       />
+      </Tooltip>
+      <Tooltip message="Delete"> 
       <img
         src={DeleteIcon}
         alt="Assign-Book"
         className="action-icon"
-        onClick={() => handleDelete(rowData)}
+        onClick={() => handleOpenConfirmModal(rowData)}
       />
+      </Tooltip>
     </div>
   );
 
@@ -239,21 +292,11 @@ const Users = () => {
 
           <div className="upper-div-btns">
             <div className="upper-search-div">
-              <div className="search-input-div">
-                <div className="search-icon-div">
-                  <img src={SearchIcon} alt="" />
-                </div>
-
-                <div className="search-categories-div">
-                  <input
-                    type="text"
-                    placeholder="Search Users..."
-                    className="search-input"
-                    value={searchTerm}
-                    onChange={handleSearchInputChange}
-                  />
-                </div>
-              </div>
+            <SearchInput
+        value={searchTerm}
+        onChange={handleSearchInputChange}
+        placeholder="Search Users..."
+      />
             </div>
 
             <div className="add-categories-div">
@@ -300,19 +343,19 @@ const Users = () => {
               name: "name",
               type: "text",
               placeholder: "User Name",
-              required: true,
+              
             },
             {
               name: "email",
               type: "email",
               placeholder: "User Email",
-              required: true,
+              
             },
             {
               name: "phoneNumber",
               type: "tel",
               placeholder: "Phone Number",
-              required: true,
+            
             },
           ]}
           onSubmit={handleAddUser}
@@ -331,6 +374,18 @@ const Users = () => {
           onClose={() => setIsIssuanceModalOpen(false)}
         />
       </Modal>
+      <ConfirmationModal
+        isOpen={isConfirmModalOpen}
+        onClose={handleCancelDelete}
+        onConfirm={handleDelete}
+        message="Are you sure you want to delete this user?"
+      />
+         <Toast 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={() => setShowToast(false)} 
+          isOpen={showToast}
+   />
     </>
   );
 };

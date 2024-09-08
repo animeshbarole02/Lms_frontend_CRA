@@ -1,19 +1,32 @@
 import Logo from "../../assets/icons/ReadingLogo.png";
 import User from "../../assets/icons/user.png";
 import LogoutSwtich from "../../assets/icons/LogoutSwitch2.png"
-import "./navbar.css";
+import './navbar.css'
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import ConfirmationModal from "../modal/confirmationModal"; 
+import { useState } from "react";
 
 const Navbar = () => {
 
+  
   const navigate = useNavigate();
 
   const user = useSelector((state) => state.auth.user);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const handleLogout = () => {
     localStorage.removeItem("token");
      navigate("/");
   };
+
+  const openConfirmModal = () => {
+    setIsConfirmModalOpen(true);
+  };
+
+  const handleCancelLogout = () => {
+    setIsConfirmModalOpen(false);
+  };
+ 
 
   return (
     <div className="navbar-div">
@@ -29,18 +42,14 @@ const Navbar = () => {
 
       <div className="header">
         <div className="user-name">
-          <img src={User} alt=""></img>
+       
 
           <p>Hello {user?.name || "Guest"}!</p> 
           <br></br>
         </div>
 
 
-        <div className="mid-heading">
-          <span>Read...</span>
-          <span>Learn...</span>
-          <span>Grow...</span>
-        </div>
+       
 
         <div className="logout-button">
           <div className="img">
@@ -48,7 +57,7 @@ const Navbar = () => {
               src={LogoutSwtich}
               alt="Logout"
               className="logout-icon"
-              onClick={handleLogout}
+              onClick={openConfirmModal}
             />
           </div>
 
@@ -58,7 +67,17 @@ const Navbar = () => {
           
         </div>
       </div>
+
+      <ConfirmationModal
+        isOpen={isConfirmModalOpen}
+        onClose={handleCancelLogout}
+        onConfirm={handleLogout}
+        message="Are you sure you want to log out?"
+      />
+  
     </div>
+
+    
   );
 };
 

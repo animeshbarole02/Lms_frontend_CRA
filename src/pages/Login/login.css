@@ -1,24 +1,17 @@
-
-
+/* General styles for larger screens (desktop, laptops) */
 .outline-div {
     border: 15px solid;
     border-color: #C63D2F;
     overflow: hidden;
     height: 100vh;
 }
-.login-div{ 
 
+.login-div{ 
     display: flex;
     height: 100vh;
     width: 100vw;
     padding: 4%;
-
-
-
 }
-
-
-
 
 .left-page {
     width: 50vw;
@@ -26,8 +19,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    
-    
 }
 
 .vertical-line {
@@ -41,66 +32,47 @@
     display: flex;
     justify-content: space-between;
     margin-bottom: 20px;
-
 }
 
-
-
 .input-div {
-     
-     display: flex;
-     flex-direction: column;
-     
-     justify-content: center;
-     align-items:center;
-     
-     
-   
-     width: 30vw;
-          
-    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items:center;
+    width: 30vw;
 }
 
 .input-div .text {
     margin-top: 1rem;
-     
     width: 25vw;
 }
 
 .input-div .text h2 {
-  display: flex;
-  padding: 0.5rem;
-  font-size: 30px;
-  color: #ef1a0f;
-
+    display: flex;
+    padding: 0.5rem;
+    font-size: 30px;
+    color: #ef1a0f;
 }
 
-
-
 .input-div .choose {
-        
-    margin: 1rem 0rem 1rem 0rem;
+    margin: 1rem 0rem;
     width: 25vw;
-    padding: 0rem 0.5rem 0rem 0.5rem;
+    padding: 0rem 0.5rem;
 }
 
 .form {
-   
     width: 25vw;
-    padding: 0rem 0.5rem 0rem 0.5rem;
+    padding: 0rem 0.5rem;
     margin-bottom: 1rem;
-    
 }
 
 .form-group { 
-    margin: 20px 0px 20px 0px;
-
-
+    margin: 20px 0px;
 }
 
 label {
     display: block;
-    padding: 0.5rem 0px 0.5rem 0px;
+    padding: 0.5rem 0px;
 }
 
 input {
@@ -108,22 +80,18 @@ input {
     width: 100%;
     border-radius: 4px;
     border: 1px solid black;
-    
 }
-
 
 .button-div{
     display: flex;
     justify-content: center;
     align-items: center;
-    
 }
-
 
 .button-div .login-btn {
     width: 24vw;
     padding: 0.8rem;
-    margin: 25px 0px 10px 0px;
+    margin: 25px 0px 10px;
     background-color:  #d6670c; 
     color: #ffffff;
     border: none; 
@@ -135,17 +103,10 @@ input {
     transition: background-color 0.3s ease, box-shadow 0.3s ease; 
 }
 
-/* Hover effect */
 .login-btn:hover {
     background-color: #C63D2F; 
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15); 
-     
 }
-
-
-
-
-
 
 .right-page {
     width: 50vw;
@@ -153,28 +114,23 @@ input {
     flex-direction: column;
     justify-content: center;
     margin-top: -4%;
-    
-    ; 
 }
 
 .img-div { 
     display: flex;
-   
     flex-direction: column;
     justify-content: center;
     align-items: center;
-  
     background-color: white; 
     padding: 20px;
 }
 
 .img-div .text {
-    margin: 20px 0px 20px 0px;
+    margin: 20px 0px;
     text-align: center;
 }
 
 .img-div .text h2 {
-     
     font-size: 40px; 
     color: #C63D2F;
 }
@@ -191,16 +147,59 @@ input {
     line-height: 1.5; 
 }
 
-.icon {
-    
-}
-
 .icon img {
     height: 60vh;
-    
-
-    
 }
 
+.error-message {
+    color: #C63D2F;
+}
 
+.loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; 
+  }
+
+/* Tablet View */
+@media (max-width: 1024px) {
+    .login-div {
+        flex-direction: column;
+        padding: 2%;
+        height: auto;
+    }
+
+    .left-page, .right-page {
+        width: 100%;
+     
+    }
+
+    .vertical-line {
+        display: none;
+    }
+
+    .input-div, .button-div .login-btn {
+        width: 40vw;
+    }
+    
+    .img-div {
+        margin-bottom: 20%;
+    }
+    .img-div .text h2 {
+
+        font-size: 30px;
+    }
+
+    .icon img {
+      display: none;
+    }
+    
+}
 

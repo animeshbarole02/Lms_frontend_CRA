@@ -1,6 +1,6 @@
 import React from 'react';
-import SideBar from '../components/SideBar/sideBar';
-import Navbar from '../components/Navbar/navbar';
+import SideBar from '../components/sideBar/sideBar';
+import Navbar from '../components/navbar/navbar';
 
 const AdminHOC = (Component) => function HOC() {
   return (

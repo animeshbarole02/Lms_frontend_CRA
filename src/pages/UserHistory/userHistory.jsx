@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import UserHOC from '../../hoc/userHOC'
-import Table from '../../components/Table/table';
+import Table from '../../components/table/table';
 import LeftPageIcon from "../../assets/icons/LeftPage.png";
 import RightPageIcon from "../../assets/icons/Right-Page.png";
 
 import { formatDateOrTime } from '../../utils/formateDateOrTime';
 import { useSelector } from 'react-redux';
-import { fetchUserHistoryDetails } from '../../api/services/userhistoryApi';
+import { fetchUserHistoryDetails } from '../../api/services/actions/userhistoryActions';
 
 import './userHistory.css'
 
@@ -22,9 +22,6 @@ const UserHistory = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [issuances, setIssuances] = useState([]);
-
-  
-    
     const columns = [
       { header: 'ID', accessor: 'id' ,width: "5%"},
       { header: 'Book', accessor: 'book',width: "5%" },

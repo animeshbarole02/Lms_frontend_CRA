@@ -1,4 +1,9 @@
 
+
+.bookspage-div .center-div {
+   height: 100vh;
+   width: 78vw;
+}
 .button-container {
     display: flex;
     justify-content: center;

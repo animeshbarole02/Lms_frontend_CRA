@@ -1,6 +1,6 @@
 import React from 'react';
-import Navbar from "../components/Navbar/navbar";
-import SideBar from "../components/SideBar/sideBar";
+import Navbar from "../components/navbar/navbar";
+import SideBar from "../components/sideBar/sideBar";
 
 const UserHOC = (Component) => function HOC() {
   return (

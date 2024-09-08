@@ -1,31 +1,37 @@
 import { useState } from "react";
-import "./issuanceform.css"; // Add appropriate CSS styling
-import { findUserByMobile } from "../../api/services/usersApi";
-import Button from "../Button/button";
+import "./issuanceform.css";
+import { findUserByMobile } from "../../api/services/actions/usersActions";
+import Button from "../button/button";
 import { formatDateTime } from "../../utils/formateDateOrTime";
-
-
-
+import { useNavigate } from "react-router-dom";
 
 const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
   const [userMobileNumber, setUserMobileNumber] = useState("");
+ const[userName , setUserName] = useState("");
   const [userId, setUserId] = useState(null);
   const [issuanceType, setIssuanceType] = useState("Home");
   const [returnDate, setReturnDate] = useState("");
   const [returnTime, setReturnTime] = useState("");
-  const [issuedAt] = useState(formatDateTime(new Date())); 
+  const [issuedAt] = useState(formatDateTime( new Date().toLocaleString())); 
   const [expectedReturn, setExpectedReturn] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [message, setMessage] = useState("");
+  const [errors, setErrors] = useState({ mobileNumber: "", returnDate: "" });
+
+ 
 
   const fetchUserDetails = async (mobileNumber) => {
     try {
       const userDetails = await findUserByMobile(mobileNumber);
+      console.log(userDetails);
+      setUserName(userDetails.name);
       setUserId(userDetails.id);
-      setErrorMessage(""); 
+      setMessage(`User with Name ${userDetails.name} found`); 
+      setErrors((prevErrors) => ({ ...prevErrors, mobileNumber: "" }));
     } catch (error) {
-      console.error("Failed to fetch user details:", error);
+    
       setUserId(null); 
-      setErrorMessage("User not found. Please register first.");
+      setMessage("User not found. Please register first.");
+      
     }
   };
 
@@ -34,43 +40,68 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
     setUserMobileNumber(mobileNumber);
 
     if (mobileNumber.length === 10) {
-
       fetchUserDetails(mobileNumber); 
     } else {
       setUserId(null); 
-      setErrorMessage("");
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        mobileNumber: "Please enter a valid mobile number.",
+      }));
     }
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-
+  
     if (!userId) {
-      setErrorMessage("Please enter a valid mobile number and try again.");
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        mobileNumber: "Please enter a valid mobile number and try again.",
+      }));
+      return;
+    }
+ 
+    if (issuanceType === "Home" && !expectedReturn) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        returnDate: "Please enter a valid return date.",
+      }));
       return;
     }
 
+    if (issuanceType === "Library" && !returnTime) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        returnDate: "Please enter a valid return time.",
+      }));
+      return;
+    }
     let returnedAt = null;
-    if (issuanceType === "Home" && returnDate) {
-      returnedAt = formatDateTime(`${returnDate}T23:59:59`); 
-    } else if (issuanceType === "Library" && returnTime) {
-      const currentDate = new Date().toISOString().slice(0, 10); 
-      returnedAt = formatDateTime(`${currentDate}T${returnTime}`); 
+  
+
+    if (issuanceType === "Home" && expectedReturn) {
+      returnedAt = formatDateTime(new Date(expectedReturn).toLocaleString());
     }
 
+    else if (issuanceType === "Library" && returnTime) {
+      const currentDate = new Date().toISOString().slice(0, 10); // Get the current date
+      returnedAt = formatDateTime(new Date(`${currentDate}T${returnTime}`).toLocaleString());
+    }
+  
     const issuanceDetails = {
-      userId, 
+      userId,
       bookId: selectedBook.id,
       issuedAt,
-      returnedAt,
-      expectedReturn: formatDateTime(expectedReturn),
-      status: "Issued", 
+      returnedAt: null,
+      expectedReturn: returnedAt, // Set the correct return time for either Home or Library
+      status: "Issued",
       issuanceType,
     };
-
+  
     onSubmit(issuanceDetails);
-    onClose(); 
+    onClose();
   };
+  
 
   return (
     <div className="issuance-form">
@@ -86,9 +117,10 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
             value={userMobileNumber}
             onChange={handleMobileNumberChange}
             placeholder="Enter User Mobile Number"
-            required
+          
           />
-          {errorMessage && <p className="error-message">{errorMessage}</p>}
+       
+          {message && <p className="error-message">{message}</p>}
         </div>
 
         <div className="form-group">
@@ -104,12 +136,30 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
 
         <div className="form-group">
           <label>Expected Return</label>
-          <input
-            type="datetime-local"
-            value={expectedReturn}
-            onChange={(e) => setExpectedReturn(e.target.value)}
-            required
-          />
+          {issuanceType === "Home" ? (
+            <>
+            <input
+              type="datetime-local"
+              value={expectedReturn}
+              onChange={(e) => setExpectedReturn(e.target.value)}
+              
+             
+            />
+            
+            {errors.returnDate && <p className="error-message">{errors.returnDate}</p>}
+            </>
+          ) : (
+            <>
+            <input
+              type="time"
+              value={returnTime}
+              onChange={(e) => setReturnTime(e.target.value)}
+              
+            />
+ 
+</>
+          )}
+           
         </div>
 
         <Button className="submit-button" text="Issue Book" />

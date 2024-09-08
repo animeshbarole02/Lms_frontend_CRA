@@ -1,34 +1,32 @@
 import "./categories.css";
 
 import { useCallback, useEffect, useState } from "react";
-import Button from "../../components/Button/button";
+import Button from "../../components/button/button";
 import EditIcon from "../../assets/icons/EditIcom.png";
 import LeftPageIcon from "../../assets/icons/LeftPage.png";
 import RightPageIcon from "../../assets/icons/Right-Page.png";
-
+import '../../components/toast/toast.css'
 
 import DeleteIcon from "../../assets/icons/DeleteIcon.png";
-import Table from "../../components/Table/table";
+import Table from "../../components/table/table";
 
-import SearchIcon from "../../assets/icons/magnifying-glass.png";
+
 import AdminHOC from "../../hoc/AdminHOC";
 import Modal from "../../components/modal/modal";
 import Dynamicform from "../../components/forms/dynamicform";
-import { fetchCategories, addCategory, deleteCategory, updateCategory } from "../../api/services/categoryApi";
+import { fetchCategories, addCategory, deleteCategory, updateCategory } from "../../api/services/actions/categoryActions";
 import Tooltip from "../../components/tooltip/toolTip";
-import { retry } from "@reduxjs/toolkit/query";
-import ConfirmationModal from "../../components/modal/confirmationModal";
 
- // Debounce utility function
-const debounce = (func, delay) => {
-  let timer;
-  return function (...args) {
-    clearTimeout(timer);
-    timer = setTimeout(() => func.apply(this, args), delay);
-  };
-};
+import ConfirmationModal from "../../components/modal/confirmationModal";
+import Toast from "../../components/toast/toast";
+import debounce from "../../utils/debounce";
+import SearchInput from "../../components/search/search";
+
+
+ 
 
 const Categories = () => {
+  const [showToast, setShowToast] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [categories, setCategories] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
@@ -37,6 +35,19 @@ const Categories = () => {
   const [editingCategory, setEditingCategory] = useState(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
+  const [toast, setToast] = useState({ message: "", type: "success", isOpen: false });
+  const [errors, setErrors] = useState({ name: "", categoryDesc: "" });
+  const columns = [
+    { header: "ID", accessor: "displayId", width: "0.25%" },
+    { header: "Category Name", accessor: "name", width: "1%" },
+    { header: "Category Description", accessor: "categoryDesc", width: "3%" },
+    {
+      header: "Actions",
+      render: (rowData) => renderActions(rowData),
+      width: "0.2%",
+    },
+  ];
+
 
   
   const debounceSearch = useCallback(
@@ -46,6 +57,7 @@ const Categories = () => {
     []
   );
 
+
   useEffect(() => {
     loadCategories(searchTerm);
   }, [currentPage]);
@@ -53,7 +65,7 @@ const Categories = () => {
 
   const loadCategories = async (search = "") => {
     try {
-      const data = await fetchCategories(currentPage, 10, search);
+      const data = await fetchCategories(currentPage, 9, search);
 
    
       
@@ -78,35 +90,75 @@ const Categories = () => {
  
   const handleAddCategory = async (category) => {
 
-    console.log(category);
+    const name = category.name ? category.name.trim() : "";
+    const categoryDesc = category.categoryDesc ? category.categoryDesc.trim() : "";
+    const isValidName = /^[A-Za-z\s]+$/.test(name);
+    const isValidDescription = /^[A-Za-z\s]+$/.test(categoryDesc);
 
-    const isValidName = /^[A-Za-z\s]+$/.test(category.name.trim());
-  const isValidDescription = /^[A-Za-z\s]+$/.test(category.categoryDesc.trim());
+    let hasError = false;
+    setErrors({ name: "", categoryDesc: "" }); // Reset errors
+
+    if (!category.name || !category.categoryDesc && editingCategory) {
+      setErrors({
+        name: "Please Enter Name.",
+        categoryDesc: "Please Enter Category ",
+      });
+      hasError = true;
+    } else if (!isValidName) {
+      setErrors({ name: "Please enter a valid category name with only letters." });
+      hasError = true;
+    } else if (!isValidDescription) {
+      setErrors({ categoryDesc: "Please enter a valid category description with only letters." });
+      hasError = true;
+    }
+
+    if (hasError) return;
     if (isValidName && isValidDescription) {
       try {
+        let response;
         if (editingCategory) {
-       
-
-         
           await updateCategory(editingCategory.id, category);
-          setEditingCategory(null); 
+          setEditingCategory(null);
+          setToast({
+            message: `Category updated: ${category.name}`,
+            type: "success",
+            isOpen: true,
+          });
+         
         } else {
-
-        
-        
-          await addCategory(category);
+            response  =await addCategory(category);
+         
+            if (response==="Category already exists") {
+                setToast({
+                  message: `Category with name '${category.name}' already exists.`,
+                  type: "error",
+                  isOpen: true,
+                });
+              } else {
+                setToast({
+                  message: `Category added: ${category.name}`,
+                  type: "success",
+                  isOpen: true,
+                });
+              }
          
         }
+        setShowToast(true);
         loadCategories();
         handleCloseModal();
       } catch (error) {
         console.error("Failed to save category:", error);
       }
-    }else {
-        alert("Please enter a valid category name and description with only letters.");
+    } else {
+     
+      setToast({
+        message:  "Please enter a valid category name and description with only letters.",
+        type: "error",
+        isOpen: true,
+      });
+      setShowToast(true);
     }
   };
-  
 
   const handleOpenConfirmModal = (rowData) => {
     setCategoryToDelete(rowData);
@@ -118,25 +170,21 @@ const Categories = () => {
       try {
         const response = await deleteCategory(categoryToDelete.id);
   
-       
         if (response.includes("Category deleted successfully")) {
           setCategories(categories.filter((category) => category.id !== categoryToDelete.id));
-          loadCategories();
-          alert("Category is Deleted");
-        } else if (response.includes("Category cannot be deleted as some books under this category are currently issued.")) {
-          alert("Category cannot be deleted as some books under this category are currently issued.");
-        } else if (response.includes("Category and all related books deleted successfully with ID")) {
-          setCategories(categories.filter((category) => category.id !== categoryToDelete.id));
-          loadCategories();
-          alert("Category and all related books deleted successfully.");
-        } else if (response.includes("Category not found")) {
-          alert("The category you are trying to delete does not exist.");
+     
+          setToast({ message: `${response} ${categoryToDelete.name}`, type: "success", isOpen: true });
+       
         } else {
-          alert("An unexpected error occurred. Please try again.");
+          setToast({ message: `${response}`, type: "error", isOpen: true });
         }
+  
+        setShowToast(true);
+        loadCategories();  
+
       } catch (error) {
         console.error("Failed to delete the category", error);
-        alert("Failed to delete the category. Please try again later.");
+     
       } finally {
         setCategoryToDelete(null);
         setIsConfirmModalOpen(false);
@@ -167,19 +215,10 @@ const Categories = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingCategory(null);
+    setErrors({ name: "", categoryDesc: "" });
   };
 
-  const columns = [
-    { header: "ID", accessor: "displayId", width: "0.25%" },
-    { header: "Category Name", accessor: "name", width: "1%" },
-    { header: "Category Description", accessor: "categoryDesc", width: "3%" },
-    {
-      header: "Actions",
-      render: (rowData) => renderActions(rowData),
-      width: "0.2%",
-    },
-  ];
-
+ 
   const renderActions = (rowData) => (
 
     
@@ -210,6 +249,8 @@ const Categories = () => {
     setIsModalOpen(true); 
   };
 
+ 
+
 
 
   return (
@@ -219,26 +260,17 @@ const Categories = () => {
           <div className="upper-div">
             <div className="upper-div-text">
               <span>Categories</span>
+
+             
             </div>
 
             <div className="upper-div-btns">
               <div className="upper-search-div">
-                <div className="search-input-div">
-                  <div className="search-icon-div">
-                    <img src={SearchIcon} alt="" />
-                  </div>
-
-                  <div className="search-categories-div">
-                    <input
-                      type="text"
-                      placeholder="Search categories..."
-                      className="search-input"
-                      value={searchTerm}
-                      onChange={handleSearchInputChange}
-                      
-                    />
-                  </div>
-                </div>
+              <SearchInput
+        value={searchTerm}
+        onChange={handleSearchInputChange}
+        placeholder="Search categories..."
+      />
               </div>
 
               <div className="add-categories-div">
@@ -282,7 +314,7 @@ const Categories = () => {
           </div>
         </div>
       </div>
-      {/* Modal Component */}
+
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
       <Dynamicform
           heading={editingCategory ? "Edit Category" : "Add Category"}
@@ -291,20 +323,21 @@ const Categories = () => {
               name: "name",
               type: "text",
               placeholder: "Category Name",
-              required: true,
+              value: editingCategory ? editingCategory.name : ""
       
             },
             {
               name: "categoryDesc",
               type: "text",
               placeholder: "Category Description",
-              required: true,
-          
+           
+              value: editingCategory ? editingCategory.categoryDesc : ""
             },
           ]}
           onSubmit={handleAddCategory}
           isEditMode={!!editingCategory}
           initialData={editingCategory || {}}
+          errors={errors}
         />
       </Modal>
       <ConfirmationModal
@@ -313,6 +346,12 @@ const Categories = () => {
         onConfirm={handleDelete}
         message="Are you sure you want to delete this category?"
       />
+   <Toast 
+     message={toast.message} 
+     type={toast.type} 
+     onClose={() => setShowToast(false)} 
+     isOpen={showToast}
+   />
     </>
   );
 };
