@@ -19,6 +19,7 @@ import ConfirmationModal from "../../components/modal/confirmationModal";
 import Toast from "../../components/toast/toast";
 import debounce from "../../utils/debounce";
 import SearchInput from "../../components/search/search";
+import { now } from "../../utils/currentDate";
 
 
 
@@ -47,7 +48,9 @@ const Issuances = () => {
      },
     
     { header: "Status", accessor: "status", width: "5%" },
-    {header : "Type" , accessor :"issuanceType",width : "5%"},
+   { header: "Issuance Type",
+      render: (rowData) => rowData.issuanceType === "Home" ? "Take away" : "In House",
+      width :"5%"},
     {
       header: "Actions",
       render: (rowData) => renderActions(rowData),
@@ -56,11 +59,7 @@ const Issuances = () => {
   ];
 
   const todayDate = new Date().toISOString().split("T")[0];
-  const now = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000)
-  .toISOString()
-  .slice(0, 16);
 
-  
 
   const debounceSearch = useCallback(
     debounce((newSearchTerm) => {
@@ -98,9 +97,11 @@ const Issuances = () => {
   };
 
   const handleSearchInputChange = (event) => {
-    const newSearchTerm = event.target.value;
+    const newSearchTerm = event.target.value.trimStart();
     setSearchTerm(newSearchTerm);
-    debounceSearch(newSearchTerm);
+    if (newSearchTerm.trim() !== "") {
+      debounceSearch(newSearchTerm); 
+    }
   };
 
   

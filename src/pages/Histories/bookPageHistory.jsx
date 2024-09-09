@@ -3,13 +3,20 @@ import AdminHOC from '../../hoc/AdminHOC'
 import Table from '../../components/table/table';
 import { formatDateOrTime } from '../../utils/formateDateOrTime';
 import { fetchBookIssuanceDetails } from '../../api/services/actions/issuancesActions';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import LeftPageIcon from "../../assets/icons/LeftPage.png";
 import RightPageIcon from "../../assets/icons/Right-Page.png";
+import BackArrow from "../../assets/icons/back.png";
+import './historyPage.css'
 
 
 const BookHistory = () => {
- 
+  const navigate = useNavigate(); // Initialize navigate
+
+  const handleImageClick = () => {
+    navigate("/books"); // Navigate to /books page
+  };
+
    
   const location = useLocation();
   const bookId = location.state?.bookId; 
@@ -26,7 +33,9 @@ const BookHistory = () => {
     { header: 'Issued At', accessor: 'issuedAt',width:"3%" },
     { header: 'Returned At', accessor: 'returnedAt',width:"3%" },
     { header: 'Status', accessor: 'status',width:"3%" },
-    { header: 'Issuance Type', accessor: 'issuanceType',width:"3%" }
+    { header: "Issuance Type",
+      render: (rowData) => rowData.issuanceType === "Home" ? "Take away" : "In House",
+      width :"3%"}
   ];
  
 
@@ -37,8 +46,10 @@ const BookHistory = () => {
           
           try {
             const data = await fetchBookIssuanceDetails(bookId, currentPage, 10);
-            const formattedData = data.content.map(item => ({
-              ...item,
+            const startIndex = currentPage * data.size;
+            const formattedData = data.content.map((item ,index) => ({
+               ...item,
+              id:  startIndex +index + 1,
               issuedAt: formatDateOrTime(item.issuedAt,item.issuanceType),
               returnedAt: formatDateOrTime(item.returnedAt,item.issuanceType)
             }));
@@ -67,8 +78,17 @@ const BookHistory = () => {
     <div className='History-div'>
         <div className="center-div">
         <div className="upper-div">
-          <div className="upper-div-text">
+        <div className="upper-div-text">
+          <div className="img-back">
+             <img 
+             src={BackArrow} alt="backarrow" 
+             onClick={handleImageClick}
+             />
+            </div>
+
+            <div className="text">
             <span>{bookTitle} History </span>
+           </div>
           </div>
 
         </div>

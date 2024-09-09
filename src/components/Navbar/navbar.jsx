@@ -1,22 +1,20 @@
 import Logo from "../../assets/icons/ReadingLogo.png";
 import User from "../../assets/icons/user.png";
-import LogoutSwtich from "../../assets/icons/LogoutSwitch2.png"
-import './navbar.css'
+import LogoutSwtich from "../../assets/icons/LogoutSwitch2.png";
+import "./navbar.css";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import ConfirmationModal from "../modal/confirmationModal"; 
+import ConfirmationModal from "../modal/confirmationModal";
 import { useState } from "react";
 
 const Navbar = () => {
-
-  
   const navigate = useNavigate();
 
   const user = useSelector((state) => state.auth.user);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const handleLogout = () => {
     localStorage.removeItem("token");
-     navigate("/");
+    navigate("/");
   };
 
   const openConfirmModal = () => {
@@ -26,7 +24,6 @@ const Navbar = () => {
   const handleCancelLogout = () => {
     setIsConfirmModalOpen(false);
   };
- 
 
   return (
     <div className="navbar-div">
@@ -42,14 +39,9 @@ const Navbar = () => {
 
       <div className="header">
         <div className="user-name">
-       
-
-          <p>Hello {user?.name || "Guest"}!</p> 
+          <p>Hello {user?.name || "Guest"}!</p>
           <br></br>
         </div>
-
-
-       
 
         <div className="logout-button">
           <div className="img">
@@ -62,9 +54,8 @@ const Navbar = () => {
           </div>
 
           <div className="text">
-                <span>logout</span>
+            <span>logout</span>
           </div>
-          
         </div>
       </div>
 
@@ -74,10 +65,7 @@ const Navbar = () => {
         onConfirm={handleLogout}
         message="Are you sure you want to log out?"
       />
-  
     </div>
-
-    
   );
 };
 

@@ -4,20 +4,19 @@ import { findUserByMobile } from "../../api/services/actions/usersActions";
 import Button from "../button/button";
 import { formatDateTime } from "../../utils/formateDateOrTime";
 import { useNavigate } from "react-router-dom";
+import { now } from "../../utils/currentDate";
 
 const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
   const [userMobileNumber, setUserMobileNumber] = useState("");
- const[userName , setUserName] = useState("");
+  const [userName, setUserName] = useState("");
   const [userId, setUserId] = useState(null);
   const [issuanceType, setIssuanceType] = useState("Home");
   const [returnDate, setReturnDate] = useState("");
   const [returnTime, setReturnTime] = useState("");
-  const [issuedAt] = useState(formatDateTime( new Date().toLocaleString())); 
+  const [issuedAt] = useState(formatDateTime(new Date().toLocaleString()));
   const [expectedReturn, setExpectedReturn] = useState("");
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState({ mobileNumber: "", returnDate: "" });
-
- 
 
   const fetchUserDetails = async (mobileNumber) => {
     try {
@@ -25,13 +24,11 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
       console.log(userDetails);
       setUserName(userDetails.name);
       setUserId(userDetails.id);
-      setMessage(`User with Name ${userDetails.name} found`); 
+      setMessage(`User with Name ${userDetails.name} found`);
       setErrors((prevErrors) => ({ ...prevErrors, mobileNumber: "" }));
     } catch (error) {
-    
-      setUserId(null); 
+      setUserId(null);
       setMessage("User not found. Please register first.");
-      
     }
   };
 
@@ -40,19 +37,20 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
     setUserMobileNumber(mobileNumber);
 
     if (mobileNumber.length === 10) {
-      fetchUserDetails(mobileNumber); 
+      fetchUserDetails(mobileNumber);
     } else {
-      setUserId(null); 
+      setUserId(null);
+      setMessage("");
       setErrors((prevErrors) => ({
         ...prevErrors,
-        mobileNumber: "Please enter a valid mobile number.",
+        mobileNumber: mobileNumber.length > 0 ? "Please enter a valid mobile number." : "",
       }));
     }
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-  
+
     if (!userId) {
       setErrors((prevErrors) => ({
         ...prevErrors,
@@ -60,7 +58,7 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
       }));
       return;
     }
- 
+
     if (issuanceType === "Home" && !expectedReturn) {
       setErrors((prevErrors) => ({
         ...prevErrors,
@@ -77,17 +75,16 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
       return;
     }
     let returnedAt = null;
-  
 
     if (issuanceType === "Home" && expectedReturn) {
       returnedAt = formatDateTime(new Date(expectedReturn).toLocaleString());
+    } else if (issuanceType === "Library" && returnTime) {
+      const currentDate = new Date().toISOString().slice(0, 10); // Get the current date
+      returnedAt = formatDateTime(
+        new Date(`${currentDate}T${returnTime}`).toLocaleString()
+      );
     }
 
-    else if (issuanceType === "Library" && returnTime) {
-      const currentDate = new Date().toISOString().slice(0, 10); // Get the current date
-      returnedAt = formatDateTime(new Date(`${currentDate}T${returnTime}`).toLocaleString());
-    }
-  
     const issuanceDetails = {
       userId,
       bookId: selectedBook.id,
@@ -97,11 +94,10 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
       status: "Issued",
       issuanceType,
     };
-  
+
     onSubmit(issuanceDetails);
     onClose();
   };
-  
 
   return (
     <div className="issuance-form">
@@ -117,10 +113,14 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
             value={userMobileNumber}
             onChange={handleMobileNumberChange}
             placeholder="Enter User Mobile Number"
-          
           />
-       
-          {message && <p className="error-message">{message}</p>}
+ {message && (
+    <p
+      className={`message ${userId ? "success-message" : "error-message"}`}
+    >
+      {message}
+    </p>
+  )}
         </div>
 
         <div className="form-group">
@@ -129,8 +129,8 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
             value={issuanceType}
             onChange={(e) => setIssuanceType(e.target.value)}
           >
-            <option value="Home">Home</option>
-            <option value="Library">Library</option>
+            <option value="Home">Take Away</option>
+            <option value="Library">In House</option>
           </select>
         </div>
 
@@ -138,28 +138,26 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
           <label>Expected Return</label>
           {issuanceType === "Home" ? (
             <>
-            <input
-              type="datetime-local"
-              value={expectedReturn}
-              onChange={(e) => setExpectedReturn(e.target.value)}
-              
-             
-            />
-            
-            {errors.returnDate && <p className="error-message">{errors.returnDate}</p>}
+              <input
+                type="datetime-local"
+                value={expectedReturn}
+                onChange={(e) => setExpectedReturn(e.target.value)}
+                min={new Date().toISOString().slice(0, 16)}
+              />
+
+              {errors.returnDate && (
+                <p className="error-message">{errors.returnDate}</p>
+              )}
             </>
           ) : (
             <>
-            <input
-              type="time"
-              value={returnTime}
-              onChange={(e) => setReturnTime(e.target.value)}
-              
-            />
- 
-</>
+              <input
+                type="time"
+                value={returnTime}
+                onChange={(e) => setReturnTime(e.target.value)}
+              />
+            </>
           )}
-           
         </div>
 
         <Button className="submit-button" text="Issue Book" />

@@ -82,26 +82,31 @@ const Categories = () => {
   };
 
   const handleSearchInputChange = (event) => {
-    const newSearchTerm = event.target.value;
+    const newSearchTerm = event.target.value.trimStart();
     setSearchTerm(newSearchTerm);
-    debounceSearch(newSearchTerm); 
+    if (newSearchTerm.trim() !== "") {
+      debounceSearch(newSearchTerm); 
+    }
   };
 
  
   const handleAddCategory = async (category) => {
-
+    
     const name = category.name ? category.name.trim() : "";
     const categoryDesc = category.categoryDesc ? category.categoryDesc.trim() : "";
+    
+   
     const isValidName = /^[A-Za-z\s]+$/.test(name);
     const isValidDescription = /^[A-Za-z\s]+$/.test(categoryDesc);
-
+  
     let hasError = false;
-    setErrors({ name: "", categoryDesc: "" }); // Reset errors
-
-    if (!category.name || !category.categoryDesc && editingCategory) {
+    setErrors({ name: "", categoryDesc: "" });
+  
+    
+    if (!name || !categoryDesc) {
       setErrors({
-        name: "Please Enter Name.",
-        categoryDesc: "Please Enter Category ",
+        name: "Please enter a valid category name.",
+        categoryDesc: "Please enter a valid category description.",
       });
       hasError = true;
     } else if (!isValidName) {
@@ -111,52 +116,41 @@ const Categories = () => {
       setErrors({ categoryDesc: "Please enter a valid category description with only letters." });
       hasError = true;
     }
-
+  
     if (hasError) return;
-    if (isValidName && isValidDescription) {
-      try {
-        let response;
-        if (editingCategory) {
-          await updateCategory(editingCategory.id, category);
-          setEditingCategory(null);
+  
+  
+    try {
+      let response;
+      if (editingCategory) {
+        await updateCategory(editingCategory.id, { name, categoryDesc });
+        setEditingCategory(null);
+        setToast({
+          message: `Category updated: ${name}`,
+          type: "success",
+          isOpen: true,
+        });
+      } else {
+        response = await addCategory({ name, categoryDesc });
+        if (response === "Category already exists") {
           setToast({
-            message: `Category updated: ${category.name}`,
+            message: `Category with name '${name}' already exists.`,
+            type: "error",
+            isOpen: true,
+          });
+        } else {
+          setToast({
+            message: `Category added: ${name}`,
             type: "success",
             isOpen: true,
           });
-         
-        } else {
-            response  =await addCategory(category);
-         
-            if (response==="Category already exists") {
-                setToast({
-                  message: `Category with name '${category.name}' already exists.`,
-                  type: "error",
-                  isOpen: true,
-                });
-              } else {
-                setToast({
-                  message: `Category added: ${category.name}`,
-                  type: "success",
-                  isOpen: true,
-                });
-              }
-         
         }
-        setShowToast(true);
-        loadCategories();
-        handleCloseModal();
-      } catch (error) {
-        console.error("Failed to save category:", error);
       }
-    } else {
-     
-      setToast({
-        message:  "Please enter a valid category name and description with only letters.",
-        type: "error",
-        isOpen: true,
-      });
       setShowToast(true);
+      loadCategories();
+      handleCloseModal();
+    } catch (error) {
+      console.error("Failed to save category:", error);
     }
   };
 
@@ -175,8 +169,11 @@ const Categories = () => {
      
           setToast({ message: `${response} ${categoryToDelete.name}`, type: "success", isOpen: true });
        
-        } else {
-          setToast({ message: `${response}`, type: "error", isOpen: true });
+        } else if(response.includes("Category and all related books deleted successfully")) {
+          setToast({ message: `${response}`, type: "success", isOpen: true });
+        }
+        else {
+          setToast({ message: `${response}`, type: "error", isOpen: true })
         }
   
         setShowToast(true);

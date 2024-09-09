@@ -28,6 +28,8 @@ function App() {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
+  
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -67,7 +69,7 @@ function App() {
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <ProtectedRoute >
                 < Dashboard />
               </ProtectedRoute>
             }
@@ -75,7 +77,7 @@ function App() {
           <Route
             path="/categories"
             element={
-              <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <ProtectedRoute >
                 <Categories />
               </ProtectedRoute>
             }
@@ -83,7 +85,7 @@ function App() {
           <Route
             path="/books"
             element={
-              <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <ProtectedRoute>
                 <Books />
               </ProtectedRoute>
             }
@@ -91,7 +93,7 @@ function App() {
           <Route
             path="/users"
             element={
-              <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <ProtectedRoute >
                 <Users />
               </ProtectedRoute>
             }
@@ -99,7 +101,7 @@ function App() {
           <Route
             path="/issuances"
             element={
-              <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <ProtectedRoute >
                 <Issuances />
               </ProtectedRoute>
             }
@@ -109,7 +111,7 @@ function App() {
           <Route 
               path="/history"
               element = {
-                <ProtectedRoute allowedRoles ={["ADMIN"]}>
+                <ProtectedRoute >
                    <History/>
                 </ProtectedRoute>
               }
@@ -118,7 +120,7 @@ function App() {
            <Route
             path="/bookHistory"
             element={
-              <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <ProtectedRoute >
                 <BookHistory />
               </ProtectedRoute>
             }
@@ -126,17 +128,17 @@ function App() {
           <Route
             path="/userHistory"
             element={
-              <ProtectedRoute allowedRoles={["USER"]}>
+              <ProtectedRoute >
                 <UserHistory />
               </ProtectedRoute>
             }
           />
            
 
-             <Route
+           <Route
             path="*"
             element={
-              isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/" />
+              isAuthenticated ? <Navigate to={window.location.pathname} /> : <Navigate to="/" />
             }
           />
         </Routes>

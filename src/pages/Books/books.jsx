@@ -160,7 +160,7 @@ const handleAddBook = async (newBook) => {
   const title = newBook.title ? newBook.title.trim() : "";
   const author = newBook.author ? newBook.author.trim() : "";
   const categoryId = newBook.categoryId || "";
-  const quantity = newBook.quantity ? parseInt(newBook.quantity) : null;
+  const quantity = newBook.quantity ? parseInt(newBook.quantity, 10) : null;
 
   if (!title) {
     setErrors((prevErrors) => ({ ...prevErrors, title: "Book title is required." }));
@@ -238,9 +238,12 @@ const handleAddBook = async (newBook) => {
   
 
   const handleSearchInputChange = (event) => {
-    const newSearchTerm = event.target.value;
+    const newSearchTerm = event.target.value.trimStart();
+    
     setSearchTerm(newSearchTerm);
-    debounceSearch(newSearchTerm); 
+    if (newSearchTerm.trim() !== "") {
+      debounceSearch(newSearchTerm); 
+    }
   };
 
   const handlePageChange = (direction) => {
@@ -286,12 +289,14 @@ const handleAddBook = async (newBook) => {
    
     try {
 
-        console.log(issuanceDetails);
        const response = await createIssuance(issuanceDetails);
-     console.log(response);
+    
       if(response==="Issuance Added Successfully"){
        setToast({ message:response, type: "success", isOpen: true });
        setShowToast(true);
+       setTimeout(() => {
+        navigate("/issuances");
+      }, 500);
       }
        else {
 
@@ -416,6 +421,8 @@ const handleAddBook = async (newBook) => {
           </div>
         </div>
       </div>
+
+      
 
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
         <Dynamicform

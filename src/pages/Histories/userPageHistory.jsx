@@ -5,26 +5,30 @@ import { fetchUserIssuanceDetails } from '../../api/services/actions/issuancesAc
 import SearchIcon from "../../assets/icons/magnifying-glass.png";
 import LeftPageIcon from "../../assets/icons/LeftPage.png";
 import RightPageIcon from "../../assets/icons/Right-Page.png";
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { formatDateOrTime, formatDateTime } from '../../utils/formateDateOrTime';
+import BackArrow from "../../assets/icons/back.png";
+import './historyPage.css'
 
 const History = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const userId = location.state?.userId; 
   const userName =location.state?.userName;
 
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [issuances, setIssuances] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(""); 
   const columns = [
-    { header: 'ID', accessor: 'id' },
-    { header: 'Book', accessor: 'book' },
-    { header: 'Category', accessor: 'category' },
-    { header: 'Issued At', accessor: 'issuedAt' },
-    { header: 'Returned At', accessor: 'returnedAt' },
-    { header: 'Status', accessor: 'status' },
-    { header: 'Issuance Type', accessor: 'issuanceType' }
+    { header: 'ID', accessor: 'id',width :"3%" },
+    { header: 'Book', accessor: 'book',width :"3%" },
+    { header: 'Category', accessor: 'category',width :"3%" },
+    { header: 'Issued At', accessor: 'issuedAt',width :"3%" },
+    { header: 'Returned At', accessor: 'returnedAt',width :"3%" },
+    { header: 'Status', accessor: 'status' ,width :"3%"},
+    { header: "Issuance Type",
+      render: (rowData) => rowData.issuanceType === "Home" ? "Take away" : "In House",
+      width :"3%"}
   ];
 
  
@@ -34,8 +38,10 @@ const History = () => {
       
       try {
         const data = await fetchUserIssuanceDetails(userId, currentPage, 10);
-        const formattedData = data.content.map(item => ({
+        const startIndex = currentPage * data.size;
+        const formattedData = data.content.map((item ,index) => ({
           ...item,
+          id: startIndex + index + 1,
           issuedAt: formatDateOrTime(item.issuedAt,item.issuanceType),
           returnedAt: formatDateOrTime(item.returnedAt,item.issuanceType)
         }));
@@ -48,6 +54,11 @@ const History = () => {
 
     loadIssuances();
   }, [currentPage, userId]);
+
+  const handleImageClick = () => {
+    navigate("/users"); // Navigate to /books page
+  };
+
 
  
  
@@ -62,7 +73,18 @@ const History = () => {
       <div className="center-div">
         <div className="upper-div">
           <div className="upper-div-text">
+
+           
+            <div className="img-back">
+             <img 
+             src={BackArrow} alt="backarrow" 
+             onClick={handleImageClick}
+             />
+            </div>
+
+            <div className="text">
             <span>{userName} History </span>
+           </div>
           </div>
 
         </div>

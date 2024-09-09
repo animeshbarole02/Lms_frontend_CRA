@@ -1,6 +1,4 @@
-
-
-import './confirmationModal.css'
+import "./confirmationModal.css";
 const ConfirmationModal = ({ isOpen, onClose, onConfirm, message }) => {
   if (!isOpen) return null;
 

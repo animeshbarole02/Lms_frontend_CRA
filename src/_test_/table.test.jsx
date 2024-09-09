@@ -1,47 +1,57 @@
 import { render, screen } from '@testing-library/react';
-import Categories from '../pages/categories/categories';
-import { act } from 'react';
 import '@testing-library/jest-dom/extend-expect';
-import { fetchCategories } from '../api/services/actions/categoryActions'; // Import the mock service
+import Table from '../components/table/table'; 
 
-// Mock the fetchCategories function
-jest.mock('../api/services/actions/categoryActions');
+describe('Table Component', () => {
+  const columns = [
+    { header: 'ID', accessor: 'id', width: '10%' },
+    { header: 'Name', accessor: 'name', width: '45%' },
+    { header: 'Description', accessor: 'categoryDesc', width: '45%' },
+  ];
 
-test('renders table with category data', async () => {
-  const mockCategories = [
+  const data = [
     { id: 1, name: 'Science', categoryDesc: 'Science related books' },
     { id: 2, name: 'Technology', categoryDesc: 'Technology related books' },
   ];
-  jest.mock('../src/services/categoryService');
-  
-  test('renders table with category data', async () => {
-    const mockCategories = [
-      { id: 1, name: 'Science', categoryDesc: 'Science related books' },
-      { id: 2, name: 'Technology', categoryDesc: 'Technology related books' },
+
+  test('renders table with correct headers and rows', () => {
+    render(<Table columns={columns} data={data} />);
+
+    // Check if table headers are rendered
+    columns.forEach(column => {
+      expect(screen.getByText(column.header)).toBeInTheDocument();
+    });
+
+    // Check if table rows are rendered
+    data.forEach(row => {
+      Object.values(row).forEach(value => {
+        expect(screen.getByText(value)).toBeInTheDocument();
+      });
+    });
+  });
+
+  test('applies custom cell rendering function', () => {
+    const customColumns = [
+      { header: 'ID', accessor: 'id', width: '10%' },
+      { header: 'Name', render: (row) => <strong>{row.name}</strong>, width: '45%' },
+      { header: 'Description', accessor: 'categoryDesc', width: '45%' },
     ];
-  
 
-    fetchCategories.mockResolvedValue({
-      content: mockCategories,
-      size: 9,
-      totalPages: 1,
-    });
-  
-    await act(async () => {
-      render(<Categories />);
-    });
-  
-    
-    await waitFor(() => {
-      
-      expect(screen.getByText('Science')).toBeInTheDocument();
-      expect(screen.getByText('Technology')).toBeInTheDocument();
-      
+    render(<Table columns={customColumns} data={data} />);
 
-      expect(screen.getByText('Science related books')).toBeInTheDocument();
-      expect(screen.getByText('Technology related books')).toBeInTheDocument();
-      
-      const tableRows = screen.getAllByRole('row');
-      expect(tableRows.length).toBe(mockCategories.length + 1);
+    // Check if custom render function works
+    data.forEach(row => {
+      expect(screen.getByText(row.name).tagName).toBe('STRONG');
     });
-  })
+  });
+
+  test('applies correct styles based on column width', () => {
+    render(<Table columns={columns} data={data} />);
+
+    // Check if the columns have the correct width applied
+    columns.forEach(column => {
+      const th = screen.getByText(column.header).closest('th');
+      expect(th).toHaveStyle(`width: ${column.width}`);
+    });
+  });
+});

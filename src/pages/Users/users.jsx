@@ -93,7 +93,7 @@ const Users = () => {
 
   const loadUsers = async (search = "") => {
     try {
-      const data = await fetchUsers(currentPage, 7, search);
+      const data = await fetchUsers(currentPage, 9, search);
 
       
       const startIndex = currentPage * data.size;
@@ -122,20 +122,37 @@ const Users = () => {
   const handleAddUser = async (user) => {
 
     let hasError = false;
+    const newErrors = { name: "", email: "", phoneNumber: "" };
+
+    // Validate Name
     const name = user.name ? user.name.trim() : "";
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const email = user.email ? emailPattern.test(user.email) : "";
-    const phonePattern = /^\d{10}$/;
-    const phoneNumber = user.phoneNumber ? phonePattern.test(user.phoneNumber) : "";
-    
-    if(!name) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        name : "Enter a Name",
-      }))
-      hasError = true;
+    if (!name) {
+        newErrors.name = "Enter a Name";
+        hasError = true;
     }
-  
+
+    // Validate Email
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const email = user.email ? user.email.trim() : "";
+    if (!email || !emailPattern.test(email)) {
+        newErrors.email = "Enter a valid Email Address";
+        hasError = true;
+    }
+
+    // Validate Phone Number
+    const phonePattern = /^\d{10}$/;
+    const phoneNumber = user.phoneNumber ? user.phoneNumber.trim() : "";
+    if (!phoneNumber || !phonePattern.test(phoneNumber)) {
+        newErrors.phoneNumber = "Enter a valid 10-digit Phone Number";
+        hasError = true;
+    }
+
+    // Set errors if there are any
+    if (hasError) {
+        setErrors(newErrors);
+        return;
+    }
+
     const newUser = {
       ...user,
       role: "USER",
@@ -214,9 +231,11 @@ const handleDelete = async () => {
   };
 
   const handleSearchInputChange = (event) => {
-    const newSearchTerm = event.target.value;
+    const newSearchTerm = event.target.value.trimStart();
     setSearchTerm(newSearchTerm);
-    debounceSearch(newSearchTerm);
+    if (newSearchTerm.trim() !== "") {
+      debounceSearch(newSearchTerm); 
+    }
   };
 
   const handlePageChange = (direction) => {
@@ -322,8 +341,12 @@ const handleDelete = async () => {
           </div>
           <div className="pagination-number">
             <span>
-              {" "}
-              {currentPage + 1}/{totalPages}
+            {totalPages > 1
+                      ? `${currentPage + 1} of ${totalPages}`
+                      : totalPages === 1
+                      ? `1 of 1`
+                      : "No pages available"}
+                
             </span>
           </div>
           <div className="right-pagination">
@@ -361,6 +384,7 @@ const handleDelete = async () => {
           onSubmit={handleAddUser}
           isEditMode={isEditMode}
           initialData={editUser || {}} 
+          errors={errors}
         />
       </Modal>
 

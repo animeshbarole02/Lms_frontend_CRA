@@ -3,6 +3,11 @@ import React from "react";
 import SearchIcon from "../../assets/icons/magnifying-glass.png";
 
 const SearchInput = ({ value, onChange, placeholder = "Search..." }) => {
+
+  const handleInputChange = (e) => {
+    const trimmedValue = e.target.value.trimStart(); 
+    onChange(trimmedValue); 
+  };
   return (
     <div className="search-input-div">
       <div className="search-icon-div">

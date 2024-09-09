@@ -92,3 +92,36 @@
     border: 2.5px solid #ff7e72;
     background-color: #ffffff;
   }
+
+  @media (max-width: 768px) {
+    .modal-content {
+        width: 40%; /* Reduce width to fit smaller screens */
+        max-width: none; /* Override max-width for smaller screens */
+    }
+
+
+    .modal-form-heading {
+        flex-direction: column;
+        font-size: 15px; /* Stack heading items vertically */
+    }
+
+    .modal-form-btn {
+        width: 12vw; /* Full width button on tablets */
+    }
+
+    .modal-form-input-div {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      
+      margin-top: 5%;
+      
+  }
+  
+  .modal-form-input select {
+    padding: 8px;
+    border: 1.5px solid;
+    font-weight: 500;
+    width: 100%;
+  }
+}

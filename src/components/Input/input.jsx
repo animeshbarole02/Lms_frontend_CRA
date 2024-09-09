@@ -1,6 +1,6 @@
 import React from "react";
 
-const Input = ({ field, value, onChange ,min}) => {
+const Input = ({ field, value, onChange, min }) => {
   const { type, name, placeholder, options = [] } = field;
 
   if (type === "select") {

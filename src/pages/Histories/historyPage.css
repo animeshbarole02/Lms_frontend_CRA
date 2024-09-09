@@ -1,0 +1,9 @@
+.upper-div-text .img-back img {
+    height: 2.5vh;
+    margin-right:10px;
+    cursor: pointer;
+}
+
+.upper-div-text {
+    display: flex;
+}

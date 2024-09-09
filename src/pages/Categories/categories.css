@@ -70,7 +70,7 @@
 .search-input-div {
     display: flex;
     border: 2.0px solid #fa604f; ;
-    height: 4.5vh;
+    height: 4.8vh;
     justify-content: center;
     align-items: center;
     border-radius: 6px;
@@ -285,6 +285,7 @@
 
 }
 
+
 .add-categories-div button {
   padding: 2px;
   font-size: 15px;
@@ -295,9 +296,9 @@
 
 .add-categories-div .add-categories-btn
 {
-   width: 15vw;
+   width: 12vw;
    height: 4vh;
-   border: 1px solid  #ec6657;
+   border: px solid  #ec6657;
 }
 
 .center-div .upper-div-text {

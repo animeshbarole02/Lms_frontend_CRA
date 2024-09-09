@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import Button from "../button/button";
-import Input from "../Input/input"; 
-
+import Input from "../Input/input";
 
 const DynamicForm = ({
   fields,
@@ -11,8 +10,6 @@ const DynamicForm = ({
   initialData = {},
   errors = {},
 }) => {
-
-  
   const [formData, setFormData] = useState(initialData);
 
   useEffect(() => {
@@ -44,9 +41,8 @@ const DynamicForm = ({
                 value={formData[field.name]}
                 onChange={handleInputChange}
                 min={field.min}
-              
               />
-               {errors[field.name] && (
+              {errors[field.name] && (
                 <p className="error-message">{errors[field.name]}</p>
               )}
             </div>
