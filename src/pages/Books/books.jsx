@@ -107,8 +107,7 @@ const Books = () => {
     };
   
     window.addEventListener("resize", handleResize);
-    
-    // Initial call to set rowsPerPage correctly
+  
     handleResize();
   
     return () => {
@@ -191,13 +190,22 @@ const handleAddBook = async (newBook) => {
   };
 
   try {
+    let response;
     if (editingBook) {
-      await updateBook(newBook.id, { ...bookToCreate });
+      response = await updateBook(newBook.id, bookToCreate);
+      if (response.success) {
+        setToast({ message: `Book updated: ${bookToCreate.title}`, type: "success", isOpen: true });
+      } else {
+        setToast({ message: response.message, type: "error", isOpen: true });
+      }
       setEditingBook(null);
-      setToast({ message: `Book Updated: ${editingBook.title}`, type: "success", isOpen: true });
     } else {
-      await createBook(bookToCreate);
-      setToast({ message: `Book added: ${bookToCreate.title}`, type: "success", isOpen: true });
+        response = await createBook(bookToCreate);
+      if (response.success) {
+        setToast({ message: `Book added: ${bookToCreate.title}`, type: "success", isOpen: true });
+      } else {
+        setToast({ message: response.message, type: "error", isOpen: true });
+      }
     }
 
     setShowToast(true);
@@ -210,40 +218,61 @@ const handleAddBook = async (newBook) => {
   }
 };
 
-  const handleDelete = async () => {
-    if (!bookToDelete) return;
-  
-    const id = bookToDelete.id;
-  
-    try {
-      const message = await deleteBook(id);
-  
-      if (message === "Book deleted successfully") {
-        setToast({ message: "Book deleted successfully.", type: "success", isOpen: true });
-        setShowToast(true);
-        loadBooks();
-      } else {
-        setToast({ message: message, type: "error", isOpen: true });
-        setShowToast(true);
-      }
-  
-    } catch (error) {
-      console.error("Failed to delete the book", error);
-      alert("Failed to delete the book due to a server error.");
-    } finally {
-      setBookToDelete(null);
-      setIsConfirmModalOpen(false);
+const handleDelete = async () => {
+  if (!bookToDelete) return;
+
+  const id = bookToDelete.id;
+
+  try {
+    
+    const response = await deleteBook(id);
+
+
+    if (response.success) {
+      setToast({
+        message: "Book deleted successfully.",
+        type: "success",
+        isOpen: true,
+      });
+      setShowToast(true);
+      loadBooks();
+    } else {
+
+      setToast({
+        message: response.message,
+        type: "error",
+        isOpen: true,
+      });
+      setShowToast(true);
     }
-  };
+  } catch (error) {
+
+    console.error("Failed to delete the book", error);
+    setToast({
+      message: "Failed to delete the book due to a server error.",
+      type: "error",
+      isOpen: true,
+    });
+    setShowToast(true);
+  } finally {
+ 
+    setBookToDelete(null);
+    setIsConfirmModalOpen(false);
+  }
+};
   
 
   const handleSearchInputChange = (event) => {
-    const newSearchTerm = event.target.value.trimStart();
+    const newSearchTerm = event.target.value;
+
+    const trimmedSearchTerm = newSearchTerm.trim();
     
-    setSearchTerm(newSearchTerm);
-    if (newSearchTerm.trim() !== "") {
-      debounceSearch(newSearchTerm); 
-    }
+    setSearchTerm(newSearchTerm); 
+  
+  
+
+    debounceSearch(trimmedSearchTerm); 
+    
   };
 
   const handlePageChange = (direction) => {
@@ -269,6 +298,7 @@ const handleAddBook = async (newBook) => {
   };
 
   const handleCloseModal = () => {
+    setErrors({ title: "", author: "", categoryId: "", quantity: "" });
     setIsModalOpen(false);
   };
 
@@ -288,27 +318,30 @@ const handleAddBook = async (newBook) => {
   const handleIssuanceSubmit = async (issuanceDetails) => {
    
     try {
-
-       const response = await createIssuance(issuanceDetails);
-    
-      if(response==="Issuance Added Successfully"){
-       setToast({ message:response, type: "success", isOpen: true });
-       setShowToast(true);
-       setTimeout(() => {
-        navigate("/issuances");
-      }, 500);
-      }
-       else {
-
-        setToast({ message:response, type: "error", isOpen: true });
+     
+      const response = await createIssuance(issuanceDetails);
+  
+      
+      if (response.success) {
+        setToast({ message: response.message, type: "success", isOpen: true });
         setShowToast(true);
-        
-       }
+        console.log("in Success ")
+       
+        setTimeout(() => {
+          navigate("/issuances");
+        }, 500);
+      } else {
+       
+        setToast({ message: response.message, type: "error", isOpen: true });
+        setShowToast(true);
+      }
+  
+    
       loadBooks();
-  } catch (error) {
+    } catch (error) {
       console.error("Failed to create issuance:", error);
-      alert("Failed to create issuance.");
-  }
+      alert("Failed to create issuance due to a server error.");
+    }
   };
 
   const handleIssue = (rowData)=> {
@@ -359,6 +392,14 @@ const handleAddBook = async (newBook) => {
 
   
   );
+
+  const handleFieldFocus = (fieldName) => {
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [fieldName]: "", // Clear the error message for the focused field
+    }));
+  };
+
 
   return (
     <>
@@ -463,6 +504,7 @@ const handleAddBook = async (newBook) => {
           isEditMode={editingBook}
           initialData={editingBook||{}}
           errors={errors}
+          onFieldFocus={handleFieldFocus}
           
         />
       </Modal>

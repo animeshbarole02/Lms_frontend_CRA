@@ -82,11 +82,11 @@ const UserIssuanceform = ({ onSubmit, selectedUser, onClose }) => {
     }
     let returnedAt = null;
 
-    // Handle Home issuance type (expecting date and time)
+  
     if (issuanceType === "Home" && expectedReturn) {
       returnedAt = formatDateTime(new Date(expectedReturn).toLocaleString());
     }
-    // Handle Library issuance type (expecting only the time)
+   
     else if (issuanceType === "Library" && returnTime) {
       const currentDate = new Date().toISOString().slice(0, 10);
       returnedAt = formatDateTime(
@@ -113,7 +113,7 @@ const UserIssuanceform = ({ onSubmit, selectedUser, onClose }) => {
     <div className="issuance-form">
       <h2>
         Issue User <br />
-        <span>{selectedUser.name}</span>
+        <span style={{ color: 'black' }}>{selectedUser.name}</span>
       </h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group">

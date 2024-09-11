@@ -90,7 +90,7 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
       bookId: selectedBook.id,
       issuedAt,
       returnedAt: null,
-      expectedReturn: returnedAt, // Set the correct return time for either Home or Library
+      expectedReturn: returnedAt,
       status: "Issued",
       issuanceType,
     };
@@ -103,7 +103,7 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
     <div className="issuance-form">
       <h2>
         Issue Book <br></br>
-        <span>{selectedBook.title}</span>
+        <span style={{ color: 'black' }}>{selectedBook.title}</span>
       </h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group">

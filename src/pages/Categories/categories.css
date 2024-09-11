@@ -3,12 +3,8 @@
 
 }
 .center-div {
-
-
     width: 78vw;
     position: relative;
-  
-    
     left: 20%;
     height: 80vh;
     padding-top: 7.5%;
@@ -19,13 +15,11 @@
 
 .center-div .upper-div-text {
     
-
     width: 10vw;
     background-color: #ffffff;
     color: black;
     font-size: 25px;
     font-weight: 250;
-   
     margin-bottom: 2%;
 }
 
@@ -35,11 +29,7 @@
 
 .upper-div {
     display: flex;
-    justify-content: space-between;
-  
-    
-    
-    
+    justify-content: space-between;    
 }
 
 .upper-div-btns {
@@ -51,16 +41,9 @@
 .lower-div {
    
     justify-content: center;
-    
     display: flex;
     flex-direction: column;
-    width: 100%;
-   
-    
-
-  
-    
-    
+    width: 100%;    
 }
 
 
@@ -75,28 +58,15 @@
     align-items: center;
     border-radius: 6px;
     width: 13vw;
-   
-    
-  
-   
-    
 }
 
 
 
 .search-icon-div {
-    
-    margin: 0px 10px 0px 10px;
-    
-  
-
+     margin: 0px 10px 0px 10px;
 }
 .search-icon-div img{
-
-    height: 2.0vh;
-
-   
-
+     height: 2.0vh;
 }
 
 
@@ -107,22 +77,18 @@
    border: none;
    outline: none;
    margin-right: 5px;
-
-
 }
 
 
 .add-categories-div button {
    padding: 5px;
    background-color: white;
-  
 }
 
 
 .add-categories-div .add-categories-btn
 {
     width: 10vw;
-    
     border: 2px solid  #ec6657;
 }
 
@@ -148,7 +114,11 @@
     width: 100%;
     justify-content: center;
     align-items: center;
-    gap: 8px;
+    gap: 16px;
+    position: fixed;
+    bottom: 2.5%;
+    left: 6%; 
+    right: 0;  
   }
 
 
@@ -168,9 +138,8 @@
 
   .left-pagination img :hover {
 
-    transform: translateY(-5px);
-    
-  }
+     transform: translateY(-5px);
+ }
 
   .right-pagination img {
     height: 3vh;
@@ -186,7 +155,7 @@
 
   @media screen and (max-width: 768px) {
     .action-icon {
-        height: 3vh;  /* Make the icon smaller */
+        height: 3vh;  
     }
 
     .actionicons {
@@ -196,14 +165,9 @@
     }
 
     .center-div {
-
-
       width: 78vw;
       position: relative;
-    
-      
       left: 25%;
-    
       height: 80vh;
       padding-top: 18%;
    
@@ -221,7 +185,6 @@
 }
 
 .upper-div-btns {
-   
     display: flex;
     gap: 10px;
 } 
@@ -229,16 +192,9 @@
 .lower-div {
    
     justify-content: center;
-    
     display: flex;
     flex-direction: column;
     width: 100%;
-   
-    
-
-  
-    
-    
 }
 
 
@@ -253,11 +209,6 @@
     align-items: center;
     border-radius: 6px;
     width: 20vw;
-   
-    
-  
-   
-    
 }
 
 .search-categories-div .search-input {
@@ -271,18 +222,12 @@
 
 
 .search-icon-div {
-    
     margin: 0px 10px 0px 10px;
-    
-  
-
 }
-.search-icon-div img{
+.search-icon-div img
+{
 
     height: 1.5vh;
-
-   
-
 }
 
 

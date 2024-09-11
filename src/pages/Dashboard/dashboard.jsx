@@ -1,24 +1,17 @@
 import React, { useEffect, useState } from "react";
 import "./dashboard.css";
-import Navbar from "../../components/navbar/navbar";
-import SideBar from "../../components/sideBar/sideBar";
 import Card from "../../components/card/card";
-
 import Reading from "../../assets/icons/girl-reading-book.png";
 import Books from "../../assets/icons/Books.png";
 import TakeAway from "../../assets/icons/Categories1.png";
 import TotalUsers from "../../assets/icons/TotalUsers.png";
 import AdminHOC from "../../hoc/AdminHOC";
-import { fetchUserCount } from "../../api/services/actions/usersActions";
-import { fetchCategoryCount } from "../../api/services/actions/categoryActions";
-import { fetchBooks, fetchTotalBookCount } from "../../api/services/actions/bookActions";
-import { fetchIssuanceCount } from "../../api/services/actions/issuancesActions";
 import Table from "../../components/table/table";
-import { current } from "@reduxjs/toolkit";
+import { fetchBooks } from "../../api/services/actions/bookActions";
+import { fetchAllCounts } from "../../api/services/actions/categoryActions";
 
 const Dashboard = () => {
   const [userCount, setUserCount] = useState(0);
-
   const [categoryCount, setCategoryCount] = useState(0);
   const [bookCount, setBookCount] = useState(0);
   const [issuanceCount, setIssuanceCount] = useState(0);
@@ -33,32 +26,25 @@ const Dashboard = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-
- 
   useEffect(() => {
-
-    
     const getCounts = async () => {
       try {
-        const userCount = await fetchUserCount();
-        setUserCount(userCount);
+     
+        const counts = await fetchAllCounts();
+        
+        
+        setBookCount(counts.bookCount);
+        setCategoryCount(counts.categoryCount);
+        setUserCount(counts.userCount);
+        setIssuanceCount(counts.issuanceCount);
 
-        const issuanceCount = await fetchIssuanceCount();
-        setIssuanceCount(issuanceCount);
-
-        const bookCount = await fetchTotalBookCount();
-        setBookCount(bookCount);
-
-        const categoryCount = await fetchCategoryCount();
-        setCategoryCount(categoryCount);
-
-        const booksTable = await fetchBooks(0, 10, "");
+       
+        const booksTable = await fetchBooks(0, 15, "");
         const transformedTable = booksTable.content.map((book, index) => ({
           ...book,
           id: index + 1,
         }));
         setTableData(transformedTable);
-        
       } catch (error) {
         console.error("Error fetching counts:", error);
       }
@@ -67,10 +53,8 @@ const Dashboard = () => {
     getCounts();
   }, []);
 
-
-
   const columns = [
-    { header: "ID", accessor: "id", width: "2%" },
+    { header: "ID", accessor: "id", width: "1%" },
     { header: "Book Title", accessor: "title", width: "7%" },
     { header: "Author", accessor: "author", width: "2%" },
   ];

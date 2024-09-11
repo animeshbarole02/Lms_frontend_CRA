@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import LibraryLogo from "../../assets/icons/WithoutBorder.png";
 import Button from "../../components/button/button";
 import "./login.css";
-import { useDispatch, useSelector } from "react-redux";
-
+import { useDispatch } from "react-redux";
 import { loginSuccess, setAuthFromLocalStorage, setError } from "../../redux/authSlice";
 
 const Login = () => {
@@ -12,7 +11,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [loading, setLoading] = useState(false);
+  
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -59,11 +58,10 @@ const Login = () => {
 
     let hasError = false;
 
-    // Reset errors
+  
     setUsernameError("");
     setPasswordError("");
 
-    // Validation for username (email or phone number)
     if (!trimmedInput) {
       setUsernameError("Please enter your email or mobile number.");
       hasError = true;
@@ -72,8 +70,8 @@ const Login = () => {
       hasError = true;
     }
 
-    // Validation for password
-    if (!hasError && !trimmedPassword) {
+   
+    if (!trimmedPassword) {
       setPasswordError("Please enter your password.");
       hasError = true;
     }
@@ -88,7 +86,7 @@ const Login = () => {
     };
 
     try {
-      setLoading(true);
+    
       const response = await fetch("http://localhost:8080/api/v1/signin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -98,8 +96,9 @@ const Login = () => {
       const data = await response.json();
 
       if (data.Message && data.Message === "Bad credentials") {
-        setUsernameError("Invalid email, mobile number, or password.");
-        setLoading(false);
+
+        setPasswordError("Invalid password. Please try again.");
+       
         return;
       }
 
@@ -121,7 +120,21 @@ const Login = () => {
       console.error("Login error:", error);
       dispatch(setError("An error occurred. Please try again later."));
     } finally {
-      setLoading(false);
+     
+    }
+  };
+
+  const handleUsernameChange = (e) => {
+    setUsernameOrPhoneNumber(e.target.value);
+    if (e.target.value.trim()) {
+      setUsernameError("");
+    }
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+    if (e.target.value.trim()) {
+      setPasswordError("");
     }
   };
 
@@ -142,7 +155,7 @@ const Login = () => {
                     id="username"
                     name="username"
                     value={usernameOrPhoneNumber}
-                    onChange={(e) => setUsernameOrPhoneNumber(e.target.value)}
+                    onChange={handleUsernameChange}
                     placeholder="Enter your email or mobile number"
                   />
                   {usernameError && <p className="error-message">{usernameError}</p>}
@@ -156,7 +169,7 @@ const Login = () => {
                     name="password"
                     value={password}
                     placeholder="Enter your password"
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={handlePasswordChange}
                   />
                   {passwordError && <p className="error-message">{passwordError}</p>}
                 </div>

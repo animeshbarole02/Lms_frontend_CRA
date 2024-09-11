@@ -6,7 +6,7 @@ export const fetchIssuances = async (page = 0, size = 10, searchTerm = "") => {
     const response = await get(`${ISSUANCE_BASE_URL}/list`, {
       page,
       size,
-      search: encodeURIComponent(searchTerm),
+      search: searchTerm,
     });
 
     return response;
@@ -18,14 +18,14 @@ export const fetchIssuances = async (page = 0, size = 10, searchTerm = "") => {
 
 export const createIssuance = async (issuance) => {
   try {
-    if (!issuance.userId || !issuance.bookId) {
-      throw new Error("User ID and Book ID are required");
-    }
-
     const response = await post(`${ISSUANCE_BASE_URL}/save`, issuance);
 
-    console.log(response);
-    return response;
+    // Handle response
+    if (response.status === 200 || response.status === 201) {
+      return { success: true, message: response.message };
+    } else {
+      return { success: false, message: response.message };
+    }
   } catch (error) {
     console.error("Error in createIssuance function:", error);
     throw error;
@@ -38,32 +38,36 @@ export const updateIssuance = async (issuanceId, updatedData) => {
       `${ISSUANCE_BASE_URL}/update/${issuanceId}`,
       updatedData
     );
-    return response;
+
+    if (response.status === 200 || response.status === 201) {
+      return { success: true, message: response.message };
+    } else {
+      return { success: false, message: response.message || 'An error occurred while updating the issuance.' };
+    }
   } catch (error) {
     console.error("Error updating issuance:", error);
-    throw error;
+    return { success: false, message: "Failed to update issuance due to server error." };
   }
 };
 
 export const deleteIssuance = async (issuanceId) => {
   try {
     const response = await del(`${ISSUANCE_BASE_URL}/${issuanceId}`);
-    return response;
+    console.log(response);
+    if (response.status === 200 || response.status === 201) {
+      return { success: true, message: response.message };
+    } else {
+      return { success: false, message: response.message };
+    }
   } catch (error) {
     console.error("Error deleting issuance:", error);
-    throw error;
+    return { success: false, message: "Failed to delete issuance due to server error." };
   }
 };
 
-export const fetchIssuanceCount = async () => {
-  try {
-    const response = await get(`${ISSUANCE_BASE_URL}/count`);
-    return response;
-  } catch (error) {
-    console.error("Error fetching issuance count:", error);
-    throw error;
-  }
-};
+
+
+
 
 export const fetchUserIssuanceDetails = async (userId, page = 0, size = 10) => {
   try {

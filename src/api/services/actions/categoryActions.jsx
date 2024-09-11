@@ -17,21 +17,27 @@ export const fetchCategories = async (page = 0, size = 8, searchTerm = "") => {
   }
 };
 
-export const fetchCategoryCount = async () => {
+
+export const fetchAllCounts = async () => {
   try {
-    const count = await get(`${CATEGORY_BASE_URL}/count`);
-    return count;
+    const response = await get(`${CATEGORY_BASE_URL}/count/all`);
+    return response;
   } catch (error) {
-    console.error("Failed to fetch category count:", error);
+    console.error("Error fetching all counts:", error);
     throw error;
   }
 };
 
+
 export const addCategory = async (newCategory) => {
   try {
     const response = await post(`${CATEGORY_BASE_URL}/save`, newCategory);
-
-    return response;
+    if (response.status === 200 || response.status === 201) {
+      return { success: true, message: response.message };
+    } else {
+      
+      return { success: false, message: response.message };
+    }
   } catch (error) {
     console.error("Error in addCategory function:", error);
     throw error;
@@ -41,8 +47,13 @@ export const addCategory = async (newCategory) => {
 export const deleteCategory = async (id) => {
   try {
     const response = await del(`${CATEGORY_BASE_URL}/${id}`);
+    console.log(response);
 
-    return response;
+    if (response.status === 200) {
+      return { success: true, message: response.message };
+    } else {
+      return { success: false, message: response.message };
+    }
   } catch (error) {
     console.error("Failed to delete category:", error);
     throw error;
@@ -65,7 +76,12 @@ export const updateCategory = async (categoryId, updatedCategory) => {
       `${CATEGORY_BASE_URL}/update/${categoryId}`,
       updatedCategory
     );
-    return response;
+    if (response.status === 200) {
+      return { success: true, message: response.message };
+    } else {
+     
+      return { success: false, message: response.message };
+    }
   } catch (error) {
     console.error("Error updating category:", error);
     throw error;

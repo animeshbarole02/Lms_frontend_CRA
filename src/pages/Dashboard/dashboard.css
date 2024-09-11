@@ -14,7 +14,7 @@
         justify-content: center;
         align-items: center;
         height: 100vh;
-        margin-left: 10%;
+        margin-left: 15%;
      }
     
     .dashboard-div .contains .card-table-div {
@@ -25,6 +25,7 @@
 
     .rightdash-table {
         height: 68vh;
+        width: 38vw;
     }
     
     .rightdash-div {
@@ -102,7 +103,7 @@
     
 
     .dashboard-table {
-        width: 30vw;
+        width: 38vw;
         height: 60vh;
         margin-top: 2%;
     }

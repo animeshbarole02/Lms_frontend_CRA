@@ -97,34 +97,39 @@ const Issuances = () => {
   };
 
   const handleSearchInputChange = (event) => {
-    const newSearchTerm = event.target.value.trimStart();
-    setSearchTerm(newSearchTerm);
-    if (newSearchTerm.trim() !== "") {
-      debounceSearch(newSearchTerm); 
-    }
+    const newSearchTerm = event.target.value;
+    const trimmedSearchTerm = newSearchTerm.trim();
+    setSearchTerm(newSearchTerm); 
+    debounceSearch(trimmedSearchTerm); 
+    
   };
 
   
 
-  const handleDelete = async (rowData) => {
+  const handleDelete = async () => {
     if (!issuanceToDelete) return;
     const id = issuanceToDelete.id;
+  
     try {
       const response = await deleteIssuance(id);
-      
-      setIssuances(issuances.filter((issuance) => issuance.id !== id));
-      setToast({ message: `${response}`, type: "success", isOpen: true });
+     
+      if (response.success) {
+        setIssuances(issuances.filter((issuance) => issuance.id !== id));
+        setToast({ message: response.message, type: "success", isOpen: true });
+      } else {
+        setToast({ message: response.message, type: "error", isOpen: true });
+      }
       setShowToast(true);
       loadIssuances();
     } catch (error) {
-      console.error("Failed to delete the issuance", error);
-    }finally {
-        setIssuanceToDelete(null);
-        setIsConfirmModalOpen(false);
+      console.error("Failed to delete the issuance:", error);
+     
+    } finally {
+      setIssuanceToDelete(null);
+      setIsConfirmModalOpen(false);
     }
-
-  
   };
+  
 
   const handleCancelDelete = () => {
     setIssuanceToDelete(null);
@@ -144,7 +149,6 @@ const Issuances = () => {
   };
 
   const handleEditIssuance = async (issuance) => {
-
     const formattedDate = formatDateTime(issuance.expectedReturn);
     const updatedIssuance = {
       ...issuance,
@@ -152,16 +156,24 @@ const Issuances = () => {
     };
   
     try {
-    const response =   await updateIssuance(updatedIssuance.id, updatedIssuance);
-    setToast({ message: `${response}`, type: "success", isOpen: true });
-    setShowToast(true);
-      loadIssuances();
-      handleCloseModal();
-
+      const response = await updateIssuance(updatedIssuance.id, updatedIssuance);
+  
+      if (response.success) {
+        setToast({ message: response.message, type: "success", isOpen: true });
+        setShowToast(true);
+        loadIssuances();
+        handleCloseModal();
+      } else {
+        setToast({ message: response.message, type: "error", isOpen: true });
+        setShowToast(true);
+      }
     } catch (error) {
       console.error("Failed to update the issuance", error);
+
+      
     }
   };
+  
 
   const handlePageChange = (direction) => {
     if (direction === "prev" && currentPage > 0) {

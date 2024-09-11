@@ -33,7 +33,7 @@ const SideBar = ({ isAdmin }) => {
     <div className='sideBar-div'>
       <div className="dashboard-items-div">
         {menuItems
-          .filter((item) => item.roles.includes(userRole)) // Filter items based on user role
+          .filter((item) => item.roles.includes(userRole)) 
           .map((item) => (
             <Link 
               key={item.path}

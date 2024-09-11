@@ -82,11 +82,18 @@ const Categories = () => {
   };
 
   const handleSearchInputChange = (event) => {
-    const newSearchTerm = event.target.value.trimStart();
-    setSearchTerm(newSearchTerm);
-    if (newSearchTerm.trim() !== "") {
-      debounceSearch(newSearchTerm); 
-    }
+    const newSearchTerm = event.target.value;
+
+    const trimmedSearchTerm = newSearchTerm.trim();
+    
+    setSearchTerm(newSearchTerm); 
+  
+  
+
+    debounceSearch(trimmedSearchTerm); 
+    
+  
+   
   };
 
  
@@ -123,25 +130,37 @@ const Categories = () => {
     try {
       let response;
       if (editingCategory) {
-        await updateCategory(editingCategory.id, { name, categoryDesc });
-        setEditingCategory(null);
-        setToast({
-          message: `Category updated: ${name}`,
-          type: "success",
-          isOpen: true,
-        });
-      } else {
-        response = await addCategory({ name, categoryDesc });
-        if (response === "Category already exists") {
+        const response = await updateCategory(category.id, { name, categoryDesc });
+
+        
+        if (response.success) {
           setToast({
-            message: `Category with name '${name}' already exists.`,
-            type: "error",
+            message: `Category updated: ${name}`,
+            type: "success",
             isOpen: true,
           });
         } else {
+         
+          setToast({
+            message: ` ${response.message}`,
+            type: "error",
+            isOpen: true,
+          });
+        }
+    
+      } else {
+        response = await addCategory({ name, categoryDesc });
+        if (response.success) {
           setToast({
             message: `Category added: ${name}`,
             type: "success",
+            isOpen: true,
+          });
+        } else {
+
+          setToast({
+            message: `Category with name '${name}' already exists.`,
+            type: "error",
             isOpen: true,
           });
         }
@@ -163,25 +182,38 @@ const Categories = () => {
     if (categoryToDelete) {
       try {
         const response = await deleteCategory(categoryToDelete.id);
+        console.log(response); 
   
-        if (response.includes("Category deleted successfully")) {
-          setCategories(categories.filter((category) => category.id !== categoryToDelete.id));
      
-          setToast({ message: `${response} ${categoryToDelete.name}`, type: "success", isOpen: true });
-       
-        } else if(response.includes("Category and all related books deleted successfully")) {
-          setToast({ message: `${response}`, type: "success", isOpen: true });
-        }
-        else {
-          setToast({ message: `${response}`, type: "error", isOpen: true })
+        if (response.success) {
+         
+          setCategories(categories.filter((category) => category.id !== categoryToDelete.id));
+  
+          setToast({
+            message: `${response.message} for category: ${categoryToDelete.name}`,
+            type: "success",
+            isOpen: true,
+          });
+          setShowToast(true);
+        } else {
+          
+          setToast({
+            message: response.message,
+            type: "error", 
+            isOpen: true,
+          });
+          setShowToast(true);
         }
   
-        setShowToast(true);
-        loadCategories();  
-
+        loadCategories(); 
+  
       } catch (error) {
         console.error("Failed to delete the category", error);
-     
+        setToast({
+          message: "An error occurred while deleting the category.",
+          type: "error",
+          isOpen: true,
+        });
       } finally {
         setCategoryToDelete(null);
         setIsConfirmModalOpen(false);
@@ -244,6 +276,14 @@ const Categories = () => {
   const handleEdit = (rowData) => {
     setEditingCategory(rowData); 
     setIsModalOpen(true); 
+  };
+
+
+  const handleFieldFocus = (fieldName) => {
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [fieldName]: "", 
+    }));
   };
 
  
@@ -335,6 +375,8 @@ const Categories = () => {
           isEditMode={!!editingCategory}
           initialData={editingCategory || {}}
           errors={errors}
+          onFieldFocus={handleFieldFocus}
+          
         />
       </Modal>
       <ConfirmationModal

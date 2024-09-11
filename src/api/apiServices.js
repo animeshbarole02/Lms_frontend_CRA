@@ -12,17 +12,23 @@ const getAuthHeaders = () => {
 
 
 const handleResponse = async (response) => {
-  if (!response.ok) {
-    const errorText = await response.text(); 
-    throw new Error(`HTTP error! Status: ${response.status} - ${response.statusText}. ${errorText}`);
-  }
-
   const contentType = response.headers.get("content-type");
+
+
   if (contentType && contentType.includes("application/json")) {
-    return response.json();
+    const responseBody = await response.json(); 
+
+    return {
+      status: response.status,
+      message: responseBody.message, 
+    };
   }
 
-  return response.text(); 
+
+  return {
+    status: response.status,
+    message: await response.text(), 
+  };
 };
 
 
@@ -33,7 +39,7 @@ export const get = async (url, params = {}) => {
     headers: getAuthHeaders(),
   });
 
-  return handleResponse(response);
+  return response.json();
 };
 
 

@@ -56,7 +56,7 @@ const History = () => {
   }, [currentPage, userId]);
 
   const handleImageClick = () => {
-    navigate("/users"); // Navigate to /books page
+    navigate("/users"); 
   };
 
 

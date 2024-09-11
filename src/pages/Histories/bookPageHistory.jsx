@@ -11,10 +11,10 @@ import './historyPage.css'
 
 
 const BookHistory = () => {
-  const navigate = useNavigate(); // Initialize navigate
+  const navigate = useNavigate(); 
 
   const handleImageClick = () => {
-    navigate("/books"); // Navigate to /books page
+    navigate("/books"); 
   };
 
    

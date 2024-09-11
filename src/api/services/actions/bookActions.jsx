@@ -17,20 +17,17 @@ export const fetchBooks = async (page = 0, size = 7, searchTerm = "") => {
   }
 };
 
-export const fetchTotalBookCount = async () => {
-  try {
-    const response = await get(`${BOOK_BASE_URL}/count`);
-    return response;
-  } catch (error) {
-    console.error("Failed to fetch total book count:", error);
-    throw error;
-  }
-};
+
 
 export const createBook = async (book) => {
   try {
-    const response = await post(`${BOOK_BASE_URL}/create`, [book]);
-    return response;
+    const response = await post(`${BOOK_BASE_URL}/create`, book);
+     if(response.status===200 || response.status===201){
+        return {success :true,message :response.message};
+     }
+     else {
+        return {success:false ,message :response.message};
+     }
   } catch (error) {
     console.error("Failed to create book:", error);
     throw error;
@@ -40,21 +37,30 @@ export const createBook = async (book) => {
 export const deleteBook = async (id) => {
   try {
     const response = await del(`${BOOK_BASE_URL}/delete/${id}`);
-    return response;
+    
+    if (response.status === 200) {
+      return { success: true, message: response.message };
+    } else {
+      return { success: false, message: response.message };
+    }
   } catch (error) {
     console.error("Failed to delete book:", error);
-    throw error;
+    return { success: false, message: "An unexpected error occurred." };
   }
 };
 
 export const updateBook = async (id, updatedBook) => {
   try {
     const response = await patch(`${BOOK_BASE_URL}/update/${id}`, updatedBook);
-
-    return response;
+    console.log(response);
+    if (response.status === 200 || response.status === 201) {
+      return { success: true, message: response.message };
+    } else {
+      return { success: false, message: response.message };
+    }
   } catch (error) {
     console.error("Failed to update book:", error);
-    throw error;
+    return { success: false, message: "An unexpected error occurred." };
   }
 };
 

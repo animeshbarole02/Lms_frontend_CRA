@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Button from "../button/button";
-import Input from "../Input/input";
+import Input from "../Input/input"; 
+
 
 const DynamicForm = ({
   fields,
@@ -9,7 +10,10 @@ const DynamicForm = ({
   isEditMode,
   initialData = {},
   errors = {},
+  onFieldFocus,
 }) => {
+
+  
   const [formData, setFormData] = useState(initialData);
 
   useEffect(() => {
@@ -19,6 +23,13 @@ const DynamicForm = ({
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleInputFocus = (e) => {
+    const { name } = e.target;
+    if (onFieldFocus) {
+      onFieldFocus(name);
+    }
   };
 
   const handleSubmit = (e) => {
@@ -40,9 +51,11 @@ const DynamicForm = ({
                 field={field}
                 value={formData[field.name]}
                 onChange={handleInputChange}
+                onFocus={handleInputFocus}
                 min={field.min}
+              
               />
-              {errors[field.name] && (
+               {errors[field.name] && (
                 <p className="error-message">{errors[field.name]}</p>
               )}
             </div>

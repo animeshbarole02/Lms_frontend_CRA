@@ -97,11 +97,11 @@ const Users = () => {
 
       
       const startIndex = currentPage * data.size;
-      const transformedCategories = data.content.map((user, index) => ({
+      const transformedUsers= data.content.map((user, index) => ({
         ...user,
        displayId : startIndex + index + 1,
       }));
-      setUsers(transformedCategories);
+      setUsers(transformedUsers);
       setTotalPages(data.totalPages);
     } catch (error) {
       console.error("Failed to load Users:", error);
@@ -116,6 +116,7 @@ const Users = () => {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setErrors({name :"",email :"",phoneNumber: ""})
     setEditUser(null)
   };
 
@@ -124,14 +125,13 @@ const Users = () => {
     let hasError = false;
     const newErrors = { name: "", email: "", phoneNumber: "" };
 
-    // Validate Name
+   
     const name = user.name ? user.name.trim() : "";
     if (!name) {
         newErrors.name = "Enter a Name";
         hasError = true;
     }
 
-    // Validate Email
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const email = user.email ? user.email.trim() : "";
     if (!email || !emailPattern.test(email)) {
@@ -139,7 +139,7 @@ const Users = () => {
         hasError = true;
     }
 
-    // Validate Phone Number
+    
     const phonePattern = /^\d{10}$/;
     const phoneNumber = user.phoneNumber ? user.phoneNumber.trim() : "";
     if (!phoneNumber || !phonePattern.test(phoneNumber)) {
@@ -147,7 +147,7 @@ const Users = () => {
         hasError = true;
     }
 
-    // Set errors if there are any
+  
     if (hasError) {
         setErrors(newErrors);
         return;
@@ -160,16 +160,26 @@ const Users = () => {
     };
   
     try {
+      let response;
       if (isEditMode && editUser) {
-      
-        const responseMessage = await updateUser(editUser.id, newUser);
-        setToast({ message: "User updated successfully", type: "success", isOpen: true });
+        response = await updateUser(editUser.id, newUser);
+
+        if (response.success) {
+          setToast({ message: "User updated successfully.", type: "success", isOpen: true });
+        } else {
+          setToast({ message: response.message, type: "error", isOpen: true });
+        }
         setShowToast(true);
       } else {
-        // Add new user
-        await addUser(newUser);
-        setToast({ message: "User added successfully.", type: "success", isOpen: true });
-        setShowToast(true);
+    
+        response = await addUser(newUser);
+        if (response.success) {
+          setToast({ message: "User added successfully.", type: "success", isOpen: true });
+          setShowToast(true);
+        } else {
+          setToast({ message: response.message, type: "error", isOpen: true });
+          setShowToast(true);
+        }
       }
   
       loadUsers(); 
@@ -194,14 +204,14 @@ const handleDelete = async () => {
   try {
     const response = await deleteUser(id); 
 
-    if (response === "User deleted successfully") {
+    if (response.success) {
       setUsers(users.filter((user) => user.id !== id)); 
-      setToast({ message: response, type: "success", isOpen: true });
+      setToast({ message: response.message, type: "success", isOpen: true });
+      setShowToast(true);
     } else {
-      setToast({ message: response, type: "error", isOpen: true }); 
-    
-    setShowToast(true);
-    loadUsers();
+      setToast({ message: response.message, type: "error", isOpen: true }); 
+      setShowToast(true);
+      loadUsers();
   } 
 }catch (error) {
     console.log("Failed to delete User", error); 
@@ -231,11 +241,11 @@ const handleDelete = async () => {
   };
 
   const handleSearchInputChange = (event) => {
-    const newSearchTerm = event.target.value.trimStart();
-    setSearchTerm(newSearchTerm);
-    if (newSearchTerm.trim() !== "") {
-      debounceSearch(newSearchTerm); 
-    }
+    const newSearchTerm = event.target.value;
+    const trimmedSearchTerm = newSearchTerm.trim();
+    setSearchTerm(newSearchTerm); 
+    debounceSearch(trimmedSearchTerm); 
+    
   };
 
   const handlePageChange = (direction) => {
@@ -247,30 +257,32 @@ const handleDelete = async () => {
   };
 
  
-
   const handleIssuanceSubmit = async (issuanceDetails) => {
- 
+   
     try {
-      const response = await createIssuance(issuanceDetails);
-      
      
+      const response = await createIssuance(issuanceDetails);
+  
       
-     console.log(response);
-      if(response==="Issuance Added Successfully"){
-       setToast({ message:response, type: "success", isOpen: true });
-       setShowToast(true);
-      }
-       else {
-
-        setToast({ message:response, type: "error", isOpen: true });
+      if (response.success) {
+        setToast({ message: response.message, type: "success", isOpen: true });
         setShowToast(true);
-        
-       }
+  
+       
+        setTimeout(() => {
+          navigate("/issuances");
+        }, 500);
+      } else {
+       
+        setToast({ message: response.message, type: "error", isOpen: true });
+        setShowToast(true);
+      }
+  
+    
       loadUsers();
-      
     } catch (error) {
       console.error("Failed to create issuance:", error);
-      alert("Failed to create issuance.");
+      alert("Failed to create issuance due to a server error.");
     }
   };
 
@@ -300,6 +312,15 @@ const handleDelete = async () => {
       </Tooltip>
     </div>
   );
+
+  
+  const handleFieldFocus = (fieldName) => {
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [fieldName]: "", 
+    }));
+  };
+
 
   return (
     <>
@@ -385,6 +406,7 @@ const handleDelete = async () => {
           isEditMode={isEditMode}
           initialData={editUser || {}} 
           errors={errors}
+          onFieldFocus={handleFieldFocus}
         />
       </Modal>
 
