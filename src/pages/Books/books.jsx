@@ -347,7 +347,7 @@ const handleDelete = async () => {
        
         setTimeout(() => {
           navigate("/issuances");
-        }, 500);
+        }, 1000);
       } else {
        
         setToast({ message: response.message, type: "error", isOpen: true });
