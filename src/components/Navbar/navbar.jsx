@@ -1,5 +1,4 @@
 import Logo from "../../assets/icons/ReadingLogo.png";
-import User from "../../assets/icons/user.png";
 import LogoutSwtich from "../../assets/icons/LogoutSwitch2.png";
 import "./navbar.css";
 import { useNavigate } from "react-router-dom";
@@ -44,6 +43,7 @@ const Navbar = () => {
         </div>
 
         <div className="logout-button">
+         
           <div className="img">
             <img
               src={LogoutSwtich}
@@ -51,10 +51,6 @@ const Navbar = () => {
               className="logout-icon"
               onClick={openConfirmModal}
             />
-          </div>
-
-          <div className="text">
-            <span>logout</span>
           </div>
         </div>
       </div>

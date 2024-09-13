@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-  findBookByTitle,
+
   findBookSuggestions,
 } from "../../api/services/actions/bookActions";
 import "./issuanceform.css";
@@ -29,9 +29,11 @@ const UserIssuanceform = ({ onSubmit, selectedUser, onClose }) => {
     }
 
     try {
-      const suggestions = await findBookSuggestions(query);
-      console.log("Suggestions: ", suggestions);
-      setBookSuggestions(suggestions);
+      const response = await findBookSuggestions(query);
+      const suggestions = response.data;
+      const availableBooks = suggestions.filter((book) => book.quantity > 0);
+
+      setBookSuggestions(availableBooks);
       setShowDropdown(true);
     } catch (error) {
       console.error("Failed to fetch book suggestions:", error);
@@ -102,9 +104,6 @@ const UserIssuanceform = ({ onSubmit, selectedUser, onClose }) => {
       status: "Issued",
       issuanceType,
     };
-
-    console.log(issuanceDetails);
-
     onSubmit(issuanceDetails);
     onClose();
   };

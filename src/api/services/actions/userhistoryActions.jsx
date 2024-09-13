@@ -1,4 +1,3 @@
-// categoriesApi.js
 import { get } from "../../apiServices";
 import { USER_HISTORY_BASE_URL } from "../../apiConstants";
 
@@ -10,7 +9,7 @@ export const fetchUserHistoryDetails = async (userId, page = 0, size = 10) => {
       size,
     });
 
-    return response;
+    return { success: true, data: response}
   } catch (error) {
     console.error("Error fetching user issuance details:", error);
     throw error;

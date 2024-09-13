@@ -1,9 +1,23 @@
-import React from "react";
+import React, { useEffect } from "react";
 import './toast.css';
 
 const Toast = ({ message, type, isOpen, onClose }) => {
-  if (!isOpen) return null;
 
+
+  useEffect(() => {
+    if (isOpen) {
+      const timer = setTimeout(() => {
+        onClose(); 
+      }, 3000);
+
+ 
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, onClose]);
+
+
+
+  if (!isOpen) return null;
   const toastType = type === "success" ? "toast-success" : "toast-error";
 
   return (

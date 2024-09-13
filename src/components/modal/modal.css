@@ -39,14 +39,7 @@
     font-size: 1.5rem;
     cursor: pointer;
   }
-  
-  .modal-form {
    
-  
-  
-  
-  }
-  
   .modal-form-heading {
       display: flex;
       
@@ -59,7 +52,6 @@
       display: flex;
       flex-direction: column;
       gap: 25px;
-      
       margin-top: 5%;
       
   }
@@ -95,18 +87,18 @@
 
   @media (max-width: 768px) {
     .modal-content {
-        width: 40%; /* Reduce width to fit smaller screens */
-        max-width: none; /* Override max-width for smaller screens */
+        width: 40%; 
+        max-width: none; 
     }
 
 
     .modal-form-heading {
         flex-direction: column;
-        font-size: 15px; /* Stack heading items vertically */
+        font-size: 15px;
     }
 
     .modal-form-btn {
-        width: 12vw; /* Full width button on tablets */
+        width: 12vw; 
     }
 
     .modal-form-input-div {

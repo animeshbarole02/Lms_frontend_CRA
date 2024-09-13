@@ -22,7 +22,7 @@
 }
 
 .item {
-    padding: 4px;
+    padding: 8px;
     width: 15vw;
     border-radius: 10px;
     cursor: pointer;
@@ -40,7 +40,7 @@
 }
 
 .item img {
-    height: 4vh;
+    height: 3.5vh;
 }
 
 .item-text {
@@ -61,20 +61,20 @@
 }
 
 .dashboard-items-div {
-    margin-top: 30%; /* Adjust spacing for tablet */
-    height: 60vh; /* Adjust height */
-    gap: 20px; /* Reduce gap for better spacing */
+    margin-top: 30%; 
+    height: 60vh; 
+    gap: 20px; 
 }
 
 .item {
     border-radius: 8px;
-    padding: 2px; /* Increase padding for better touch interaction */
-    width: 15vw; /* Increase width of the items */
-    font-size: 16px; /* Adjust text size */
+    padding: 2px; 
+    width: 15vw;
+    font-size: 16px; 
 }
 
 .item img {
-    height: 5vh; /* Adjust image size */
+    height: 5vh;
 }
 
 .item-text {

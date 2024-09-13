@@ -37,7 +37,8 @@ const History = () => {
       if (!userId) return; 
       
       try {
-        const data = await fetchUserIssuanceDetails(userId, currentPage, 10);
+        const response = await fetchUserIssuanceDetails(userId, currentPage, 10);
+        const data =  response.data;
         const startIndex = currentPage * data.size;
         const formattedData = data.content.map((item ,index) => ({
           ...item,

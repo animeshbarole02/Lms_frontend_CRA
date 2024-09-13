@@ -19,61 +19,73 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
   const [errors, setErrors] = useState({ mobileNumber: "", returnDate: "" });
 
   const fetchUserDetails = async (mobileNumber) => {
-    try {
-      const userDetails = await findUserByMobile(mobileNumber);
-      console.log(userDetails);
-      setUserName(userDetails.name);
-      setUserId(userDetails.id);
-      setMessage(`User with Name ${userDetails.name} found`);
-      setErrors((prevErrors) => ({ ...prevErrors, mobileNumber: "" }));
-    } catch (error) {
-      setUserId(null);
-      setMessage("User not found. Please register first.");
-    }
+    const response = await findUserByMobile(mobileNumber);
+  
+    if (response) {
+    
+      if (response.data && response.data.name) {
+        setUserName(response.data.name);
+        setUserId(response.data.id);
+        setMessage(`User with Name ${response.data.name} found.`);
+        setErrors((prevErrors) => ({ ...prevErrors, mobileNumber: "" }));
+      } else {
+       
+        setUserId(null);
+        setMessage("User not found. Please register first.");
+      }
+    } 
   };
-
   const handleMobileNumberChange = (e) => {
     const mobileNumber = e.target.value;
     setUserMobileNumber(mobileNumber);
 
-    if (mobileNumber.length === 10) {
-      fetchUserDetails(mobileNumber);
-    } else {
-      setUserId(null);
-      setMessage("");
+    if (mobileNumber.length > 0) {
       setErrors((prevErrors) => ({
         ...prevErrors,
-        mobileNumber: mobileNumber.length > 0 ? "Please enter a valid mobile number." : "",
+        mobileNumber: "",
       }));
     }
+
+    if (mobileNumber.length === 10) {
+      fetchUserDetails(mobileNumber);
+    } 
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    if (!userId) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        mobileNumber: "Please enter a valid mobile number and try again.",
-      }));
-      return;
-    }
+  if (!userMobileNumber) {
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      mobileNumber: "Mobile number is required.",
+    }));
+    return; 
+  }
 
-    if (issuanceType === "Home" && !expectedReturn) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        returnDate: "Please enter a valid return date.",
-      }));
-      return;
-    }
 
-    if (issuanceType === "Library" && !returnTime) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        returnDate: "Please enter a valid return time.",
-      }));
-      return;
-    }
+  if (!userId) {
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      mobileNumber: "Please enter a valid mobile number and try again.",
+    }));
+    return;
+  }
+
+  if (issuanceType === "Home" && !expectedReturn) {
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      returnDate: "Expected return date is required.",
+    }));
+    return;
+  }
+
+  if (issuanceType === "Library" && !returnTime) {
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      returnDate: "Expected return time is required.",
+    }));
+    return;
+  }
     let returnedAt = null;
 
     if (issuanceType === "Home" && expectedReturn) {
@@ -114,6 +126,7 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
             onChange={handleMobileNumberChange}
             placeholder="Enter User Mobile Number"
           />
+            {errors.mobileNumber && <p className="error-message">{errors.mobileNumber}</p>}
  {message && (
     <p
       className={`message ${userId ? "success-message" : "error-message"}`}
@@ -156,6 +169,7 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
                 value={returnTime}
                 onChange={(e) => setReturnTime(e.target.value)}
               />
+              {errors.returnDate && <p className="error-message">{errors.returnDate}</p>}
             </>
           )}
         </div>

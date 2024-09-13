@@ -8,7 +8,7 @@ export const fetchUsers = async (page = 0, size = 7, searchTerm = "") => {
       size,
       search: searchTerm,
     });
-    return response;
+    return { success: true, data: response}
   } catch (error) {
     console.error("Failed to fetch users:", error);
     throw error;
@@ -52,7 +52,11 @@ export const deleteUser = async (id) => {
 export const findUserByMobile = async (number) => {
   try {
     const response = await get(`${USERS_BASE_URL}/number/${number}`);
-    return response;
+   
+  
+     return  { success : true , data : response}
+    
+  
   } catch (error) {
     console.error("Failed to get the user details:", error);
     throw error;

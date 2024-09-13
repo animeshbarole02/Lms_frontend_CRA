@@ -1,4 +1,4 @@
-/* General styles for larger screens (desktop, laptops) */
+
 .outline-div {
     border: 15px solid;
     border-color: #C63D2F;
@@ -156,7 +156,7 @@ input {
 }
 
 
-/* Tablet View */
+
 @media (max-width: 1024px) {
     .login-div {
         flex-direction: column;

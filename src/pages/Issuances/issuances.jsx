@@ -20,6 +20,7 @@ import Toast from "../../components/toast/toast";
 import debounce from "../../utils/debounce";
 import SearchInput from "../../components/search/search";
 import { now } from "../../utils/currentDate";
+import Loader from "../../components/loader/loader";
 
 
 
@@ -34,6 +35,7 @@ const Issuances = () => {
   const [editingIssuance, setEditingIssuance] = useState(null);
   const [issuanceToDelete , setIssuanceToDelete]  = useState(null);
   const [toast, setToast] = useState({ message: "", type: "success", isOpen: false });
+  const [loading,setLoading] = useState(false);
   const columns = [
     { header: "Id", accessor: "displayId", width: "3%" },
     { header: "User", accessor: "name", width: "8%" },
@@ -58,7 +60,7 @@ const Issuances = () => {
     },
   ];
 
-  const todayDate = new Date().toISOString().split("T")[0];
+  //const todayDate = new Date().toISOString().split("T")[0];
 
 
   const debounceSearch = useCallback(
@@ -77,22 +79,25 @@ const Issuances = () => {
   
   const loadIssuances = async (search = "") => {
     try {
-      const data = await fetchIssuances(currentPage, 8, search);
-      console.log(data);
-     
+      setLoading(true);
+      const response = await fetchIssuances(currentPage, 9, search);
+      const data = response.data;
+      
+      const startIndex = currentPage * data.size;
       const transformedIssuances = data.content.map((issuance, index) => ({
         ...issuance,
-        displayId: index + 1,
+        displayId: startIndex + index + 1,
         name: issuance.user?.name || "Unknown", 
         title: issuance.book?.title || "Unknown", 
 
       }));
-
-      console.log(transformedIssuances);
       setIssuances(transformedIssuances);
       setTotalPages(data.totalPages);
     } catch (error) {
       console.error("Failed to load issuances:", error);
+    }
+    finally {
+      setLoading(false);
     }
   };
 
@@ -100,7 +105,13 @@ const Issuances = () => {
     const newSearchTerm = event.target.value;
     const trimmedSearchTerm = newSearchTerm.trim();
     setSearchTerm(newSearchTerm); 
-    debounceSearch(trimmedSearchTerm); 
+    if (trimmedSearchTerm.length < 3 && trimmedSearchTerm.length > 0) {
+      
+      loadIssuances();
+    } else {
+    
+      debounceSearch(trimmedSearchTerm);
+    }
     
   };
 
@@ -111,6 +122,7 @@ const Issuances = () => {
     const id = issuanceToDelete.id;
   
     try {
+      setLoading(true);
       const response = await deleteIssuance(id);
      
       if (response.success) {
@@ -126,6 +138,7 @@ const Issuances = () => {
      
     } finally {
       setIssuanceToDelete(null);
+      setLoading(false);
       setIsConfirmModalOpen(false);
     }
   };
@@ -156,6 +169,7 @@ const Issuances = () => {
     };
   
     try {
+      setLoading(true);
       const response = await updateIssuance(updatedIssuance.id, updatedIssuance);
   
       if (response.success) {
@@ -171,6 +185,8 @@ const Issuances = () => {
       console.error("Failed to update the issuance", error);
 
       
+    }finally {
+      setLoading(false);
     }
   };
   
@@ -189,27 +205,31 @@ const Issuances = () => {
     setEditingIssuance(null);
   };
 
-  const renderActions = (rowData) => (
-    <div className="actionicons">
-      <Tooltip message="Edit">
-        <img
-          src={EditIcon}
-          alt="Edit"
-          className="action-icon"
-          onClick={() => handleEdit(rowData)}
-        />
-      </Tooltip>
-      <Tooltip message="Delete">
-        <img
-          src={DeleteIcon}
-          alt="Delete"
-          className="action-icon"
-          onClick={() => handleOpenConfirmModal(rowData)}
-        />
-      </Tooltip>
-    </div>
-  );
-
+  const renderActions = (rowData) => {
+    const isEditDisabled = rowData.status === "Returned";
+  
+    return (
+      <div className="actionicons">
+        <Tooltip message="Edit">
+          <img
+            src={EditIcon}
+            alt="Edit"
+            className={`action-icon ${isEditDisabled ? 'disabled' : ''}`}
+            onClick={() => !isEditDisabled && handleEdit(rowData)}
+            style={{ cursor: isEditDisabled ? 'not-allowed' : 'pointer' }}
+          />
+        </Tooltip>
+        <Tooltip message="Delete">
+          <img
+            src={DeleteIcon}
+            alt="Delete"
+            className="action-icon"
+            onClick={() => handleOpenConfirmModal(rowData)}
+          />
+        </Tooltip>
+      </div>
+    );
+  };
   const handleEdit = (rowData) => {
    
     setEditingIssuance(rowData);
@@ -241,7 +261,7 @@ const Issuances = () => {
             
             </div>
           </div>
-
+          {loading ? (<Loader/>) : (
           <div className="lower-div">
             <Table data={issuances} columns={columns} />
 
@@ -271,6 +291,7 @@ const Issuances = () => {
               </div>
             </div>
           </div>
+           )}
         </div>
       </div>
       {/* Modal Component */}

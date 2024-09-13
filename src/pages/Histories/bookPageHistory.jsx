@@ -11,18 +11,8 @@ import './historyPage.css'
 
 
 const BookHistory = () => {
-  const navigate = useNavigate(); 
 
-  const handleImageClick = () => {
-    navigate("/books"); 
-  };
-
-   
-  const location = useLocation();
-  const bookId = location.state?.bookId; 
-  const bookTitle = location.state?.bookName
   
-
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [issuances, setIssuances] = useState([]);
@@ -38,6 +28,18 @@ const BookHistory = () => {
       width :"3%"}
   ];
  
+  const navigate = useNavigate(); 
+
+  const handleImageClick = () => {
+    navigate("/books"); 
+  };
+
+   
+  const location = useLocation();
+  const bookId = location.state?.bookId; 
+  const bookTitle = location.state?.bookName
+  
+
 
 
     useEffect(() => {
@@ -45,7 +47,8 @@ const BookHistory = () => {
           if (!bookId) return; 
           
           try {
-            const data = await fetchBookIssuanceDetails(bookId, currentPage, 10);
+            const response = await fetchBookIssuanceDetails(bookId, currentPage, 10);
+            const data =  response.data;
             const startIndex = currentPage * data.size;
             const formattedData = data.content.map((item ,index) => ({
                ...item,

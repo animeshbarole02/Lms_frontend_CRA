@@ -9,7 +9,7 @@ export const fetchIssuances = async (page = 0, size = 10, searchTerm = "") => {
       search: searchTerm,
     });
 
-    return response;
+    return { success: true, data: response}
   } catch (error) {
     console.error("Error fetching issuances:", error);
     throw error;
@@ -20,7 +20,6 @@ export const createIssuance = async (issuance) => {
   try {
     const response = await post(`${ISSUANCE_BASE_URL}/save`, issuance);
 
-    // Handle response
     if (response.status === 200 || response.status === 201) {
       return { success: true, message: response.message };
     } else {
@@ -53,7 +52,6 @@ export const updateIssuance = async (issuanceId, updatedData) => {
 export const deleteIssuance = async (issuanceId) => {
   try {
     const response = await del(`${ISSUANCE_BASE_URL}/${issuanceId}`);
-    console.log(response);
     if (response.status === 200 || response.status === 201) {
       return { success: true, message: response.message };
     } else {
@@ -77,7 +75,7 @@ export const fetchUserIssuanceDetails = async (userId, page = 0, size = 10) => {
       size,
     });
 
-    return response;
+    return { success: true, data: response}
   } catch (error) {
     console.error("Error fetching user issuance details:", error);
     throw error;
@@ -91,7 +89,7 @@ export const fetchBookIssuanceDetails = async (bookId, page = 0, size = 10) => {
       page,
       size,
     });
-    return response;
+    return { success: true, data: response}
   } catch (error) {
     console.error("Error fetching user issuance details:", error);
     throw error;

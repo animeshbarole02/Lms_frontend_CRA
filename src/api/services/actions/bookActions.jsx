@@ -10,7 +10,7 @@ export const fetchBooks = async (page = 0, size = 7, searchTerm = "") => {
       search: searchTerm,
     });
 
-    return response;
+    return { success: true, data: response}
   } catch (error) {
     console.error("Failed to fetch books:", error);
     throw error;
@@ -52,7 +52,6 @@ export const deleteBook = async (id) => {
 export const updateBook = async (id, updatedBook) => {
   try {
     const response = await patch(`${BOOK_BASE_URL}/update/${id}`, updatedBook);
-    console.log(response);
     if (response.status === 200 || response.status === 201) {
       return { success: true, message: response.message };
     } else {
@@ -64,21 +63,11 @@ export const updateBook = async (id, updatedBook) => {
   }
 };
 
-export const findBookByTitle = async (title) => {
-  try {
-    const response = await get(`${BOOK_BASE_URL}/getByTitle/${title}`);
-
-    return response;
-  } catch (error) {
-    console.error("Failed to get the book details:", error);
-    throw error;
-  }
-};
 
 export const findBookSuggestions = async (searchTerm) => {
   try {
     const response = await get(`${BOOK_BASE_URL}/suggestions`, { searchTerm });
-    return response;
+    return { success: true, data: response}
   } catch (error) {
     console.error("Failed to fetch book suggestions:", error);
     throw error;

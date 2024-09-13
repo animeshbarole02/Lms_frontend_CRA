@@ -1,7 +1,4 @@
 
-.categories-div {
-
-}
 .center-div {
     width: 78vw;
     position: relative;
@@ -23,9 +20,6 @@
     margin-bottom: 2%;
 }
 
-.upper-heading span {
-  
-}
 
 .upper-div {
     display: flex;
@@ -47,9 +41,6 @@
 }
 
 
-
-
-
 .search-input-div {
     display: flex;
     border: 2.0px solid #fa604f; ;
@@ -58,6 +49,7 @@
     align-items: center;
     border-radius: 6px;
     width: 13vw;
+   
 }
 
 
@@ -81,7 +73,7 @@
 
 
 .add-categories-div button {
-   padding: 5px;
+   padding: 6.5px;
    background-color: white;
 }
 
@@ -104,6 +96,14 @@
     height: 5vh;
     cursor: pointer;
     
+  }
+  .action-icon.disabled {
+    opacity: 0.5; 
+    pointer-events: none; 
+  }
+  
+  .action-icon.disabled:hover {
+    cursor: not-allowed; 
   }
 
   
@@ -241,7 +241,7 @@
 
 .add-categories-div .add-categories-btn
 {
-   width: 12vw;
+   width: 18vw;
    height: 4vh;
    border: px solid  #ec6657;
 }

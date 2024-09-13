@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import Button from "../button/button";
 import Input from "../Input/input"; 
 
-
 const DynamicForm = ({
   fields,
   onSubmit,
@@ -12,24 +11,39 @@ const DynamicForm = ({
   errors = {},
   onFieldFocus,
 }) => {
-
-  
   const [formData, setFormData] = useState(initialData);
+  const [fieldErrors, setFieldErrors] = useState(errors);
+  useEffect(() => {
+
+    if (isEditMode) {
+      setFormData(initialData);
+    }
+  }, [initialData, isEditMode]);
 
   useEffect(() => {
-    setFormData(initialData);
-  }, [initialData]);
+    setFieldErrors(errors);
+  }, [errors]);
 
   const handleInputChange = (e) => {
+
+    
     const { name, value } = e.target;
+    
     setFormData((prevData) => ({ ...prevData, [name]: value }));
+   
+    clearError(name);
+
+   
   };
 
-  const handleInputFocus = (e) => {
-    const { name } = e.target;
-    if (onFieldFocus) {
-      onFieldFocus(name);
-    }
+
+  const clearError = (fieldName) => {
+    setFieldErrors((prevErrors) => ({
+      ...prevErrors,
+      [fieldName]: "",
+    }));
+  
+
   };
 
   const handleSubmit = (e) => {
@@ -43,20 +57,37 @@ const DynamicForm = ({
         <div className="modal-form-heading">
           <h2>{heading}</h2>
         </div>
-
+    
+      
         <div className="modal-form-input-div">
+          
           {fields.map((field) => (
             <div key={field.name} className="modal-form-input">
-              <Input
-                field={field}
-                value={formData[field.name]}
-                onChange={handleInputChange}
-                onFocus={handleInputFocus}
-                min={field.min}
-              
-              />
-               {errors[field.name] && (
-                <p className="error-message">{errors[field.name]}</p>
+             {field.type === "select" ? (
+                <select
+                  name={field.name}
+                  value={formData[field.name] || ""}
+                  onChange={handleInputChange}
+                >
+                  <option value="" disabled>
+                    {field.placeholder}
+                  </option>
+                  {field.options.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <Input
+                  field={field}
+                  value={formData[field.name] || ""} 
+                  onChange={handleInputChange}
+                  min={field.min}
+                />
+              )}
+              {fieldErrors[field.name] && (
+                <p className="error-message">{fieldErrors[field.name]}</p>
               )}
             </div>
           ))}
@@ -64,6 +95,7 @@ const DynamicForm = ({
 
         <div className="modal-form-btn-div">
           <Button
+            
             type="submit"
             text={isEditMode ? "Edit" : "Add"}
             className="modal-form-btn"

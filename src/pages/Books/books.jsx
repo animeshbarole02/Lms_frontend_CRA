@@ -27,6 +27,7 @@ import Toast from "../../components/toast/toast";
 import ConfirmationModal from "../../components/modal/confirmationModal";
 import debounce from "../../utils/debounce";
 import SearchInput from "../../components/search/search";
+import Loader from "../../components/loader/loader";
 
 
 const Books = () => {
@@ -48,10 +49,11 @@ const Books = () => {
   const [toast, setToast] = useState({ message: "", type: "success", isOpen: false });
   const [errors,setErrors] = useState({ title: "", author:"", categoryId:"",quantity: ""});
   const [rowsPerPage, setRowsPerPage] = useState(window.innerWidth <= 768 ? 15 : 9);
+  const [loading,setLoading] =  useState(false);
 
   const columns = [
     { header: "ID", accessor: "displayId", 
-      width: "5%" },
+      width: "2%" },
     { header: "Title", accessor: "title", width: "10%" },
     { header: "Author", accessor: "author", width: "8%" },
     { header: "Category", accessor: "categoryName", width: "6%" },
@@ -65,6 +67,7 @@ const Books = () => {
             text="Issue"
             className="action-button issue-button"
             onClick={() => handleIssue(rowData)}
+            disabled={rowData.quantity === 0} 
            
           />
           <Button
@@ -119,10 +122,9 @@ const Books = () => {
 
   const loadBooks = async (search = "") => {
     try {
-      const data = await fetchBooks(currentPage, rowsPerPage, search);
-
-     
-
+      setLoading(true);
+      const response = await fetchBooks(currentPage, rowsPerPage, search);
+      const data =  response.data;
       const startIndex = currentPage * data.size;
       const transformedBooks = data.content.map((book, index) => ({
         ...book,
@@ -133,15 +135,20 @@ const Books = () => {
       setTotalPages(data.totalPages);
     } catch (error) {
       console.error("Failed to load books:", error);
+    }finally {
+      setLoading(false);
     }
   };
 
 const fetchCategories = async () => {
     try {
+      setLoading(true);
       const categoryList = await fetchAllCategories(); 
-      setCategories(categoryList);
+      setCategories(categoryList.data);
     } catch (error) {
       console.error("Failed to load categories:", error);
+    }finally {
+      setLoading(false);
     }
   };
 
@@ -192,6 +199,7 @@ const handleAddBook = async (newBook) => {
   try {
     let response;
     if (editingBook) {
+      setLoading(true);
       response = await updateBook(newBook.id, bookToCreate);
       if (response.success) {
         setToast({ message: `Book updated: ${bookToCreate.title}`, type: "success", isOpen: true });
@@ -200,6 +208,7 @@ const handleAddBook = async (newBook) => {
       }
       setEditingBook(null);
     } else {
+      setLoading(true);
         response = await createBook(bookToCreate);
       if (response.success) {
         setToast({ message: `Book added: ${bookToCreate.title}`, type: "success", isOpen: true });
@@ -215,6 +224,8 @@ const handleAddBook = async (newBook) => {
     console.error("Failed to add book:", error);
    
    
+  }finally {
+    setLoading(true);
   }
 };
 
@@ -224,7 +235,8 @@ const handleDelete = async () => {
   const id = bookToDelete.id;
 
   try {
-    
+     
+    setLoading(true);
     const response = await deleteBook(id);
 
 
@@ -255,7 +267,7 @@ const handleDelete = async () => {
     });
     setShowToast(true);
   } finally {
- 
+    setLoading(false);
     setBookToDelete(null);
     setIsConfirmModalOpen(false);
   }
@@ -271,7 +283,13 @@ const handleDelete = async () => {
   
   
 
-    debounceSearch(trimmedSearchTerm); 
+    if (trimmedSearchTerm.length < 3 && trimmedSearchTerm.length > 0) {
+      
+      loadBooks();
+    } else {
+    
+      debounceSearch(trimmedSearchTerm);
+    }
     
   };
 
@@ -303,8 +321,7 @@ const handleDelete = async () => {
   };
 
   const handleHistory = (rowData) => {
-    console.log(rowData);
-
+   
     navigate('/bookHistory' ,{state : {bookId : rowData.id ,
         bookName:rowData.title
     } 
@@ -318,14 +335,15 @@ const handleDelete = async () => {
   const handleIssuanceSubmit = async (issuanceDetails) => {
    
     try {
-     
+      
+      setLoading(true);
       const response = await createIssuance(issuanceDetails);
   
       
       if (response.success) {
         setToast({ message: response.message, type: "success", isOpen: true });
         setShowToast(true);
-        console.log("in Success ")
+      
        
         setTimeout(() => {
           navigate("/issuances");
@@ -341,6 +359,8 @@ const handleDelete = async () => {
     } catch (error) {
       console.error("Failed to create issuance:", error);
       alert("Failed to create issuance due to a server error.");
+    }finally {
+      setLoading(false);
     }
   };
 
@@ -359,7 +379,7 @@ const handleDelete = async () => {
 
   const handleEdit = (rowData) => {
 
-    console.log(rowData.category.id)
+
     setEditingBook(rowData)
     setIsModalOpen(true);
      
@@ -430,10 +450,11 @@ const handleDelete = async () => {
             </div>
           </div>
         </div>
-
+        {loading ? (<Loader/>) : (
         <div className="lower-div">
           <Table data={books} columns={columns} />
         </div>
+        )}
         <div className="pagination-div">
           <div className="left-pagination">
             <img
@@ -502,7 +523,10 @@ const handleDelete = async () => {
           ]}
           onSubmit={handleAddBook}
           isEditMode={editingBook}
-          initialData={editingBook||{}}
+          initialData={{
+            ...editingBook,
+            categoryId: editingBook?.category?.id || "", 
+          }}
           errors={errors}
           onFieldFocus={handleFieldFocus}
           

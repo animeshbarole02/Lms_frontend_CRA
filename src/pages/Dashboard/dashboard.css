@@ -1,8 +1,4 @@
-   
-   .dashboard-div {
-    
-   }
-   
+
    .leftdash-div {
        position: relative;
        padding: 1% 2% 0px 1%;
@@ -24,14 +20,14 @@
     }
 
     .rightdash-table {
-        height: 68vh;
+        height: 6vh;
         width: 38vw;
     }
     
     .rightdash-div {
         position: relative;
         left: 3%;
-        bottom: 1%;
+        bottom: 30%;
         display: flex;
         flex-direction: column;     
     }
@@ -59,7 +55,8 @@
     
     .dashborad-table-heading{
           
-        font-size: 30px;
+        font-size: 25px;
+        font-weight: 600;
      }
    
     .cards-div {
@@ -103,13 +100,11 @@
     
 
     .dashboard-table {
-        width: 38vw;
-        height: 60vh;
-        margin-top: 2%;
+        width: 35vw;
+        height: 30vh;
+        margin-top: 1%;
     }
-   
-
-
+ 
 
     @media (max-width: 768px) { 
        

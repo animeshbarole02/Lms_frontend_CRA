@@ -27,6 +27,7 @@ import Tooltip from "../../components/tooltip/toolTip";
 import Toast from "../../components/toast/toast";
 import debounce from "../../utils/debounce";
 import SearchInput from "../../components/search/search";
+import Loader from "../../components/loader/loader";
 
 
 
@@ -44,7 +45,9 @@ const Users = () => {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
   const [toast, setToast] = useState({ message: "", type: "success", isOpen: false });
-  const[errors , setErrors] = useState({name :"",email :"",phoneNumber: ""});
+  const [errors , setErrors] = useState({name :"",email :"",phoneNumber: ""});
+  const [loading, setLoading] = useState(false);
+  
 
   const columns = [
     { header: "ID", accessor: "displayId", width: "2%" },
@@ -92,10 +95,11 @@ const Users = () => {
   }, [currentPage]);
 
   const loadUsers = async (search = "") => {
+    setLoading(true);
     try {
-      const data = await fetchUsers(currentPage, 9, search);
-
-      
+    
+      const response = await fetchUsers(currentPage, 9, search);
+      const data =  response.data;
       const startIndex = currentPage * data.size;
       const transformedUsers= data.content.map((user, index) => ({
         ...user,
@@ -105,6 +109,8 @@ const Users = () => {
       setTotalPages(data.totalPages);
     } catch (error) {
       console.error("Failed to load Users:", error);
+    }finally {
+      setLoading(false);
     }
   };
 
@@ -132,10 +138,10 @@ const Users = () => {
         hasError = true;
     }
 
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailPattern = /^[^\s@]+@[^\s@]+\.com$/;
     const email = user.email ? user.email.trim() : "";
     if (!email || !emailPattern.test(email)) {
-        newErrors.email = "Enter a valid Email Address";
+        newErrors.email = "Please enter a valid email (ending with '.com')";
         hasError = true;
     }
 
@@ -162,6 +168,7 @@ const Users = () => {
     try {
       let response;
       if (isEditMode && editUser) {
+        setLoading(true);
         response = await updateUser(editUser.id, newUser);
 
         if (response.success) {
@@ -171,6 +178,7 @@ const Users = () => {
         }
         setShowToast(true);
       } else {
+        setLoading(true);
     
         response = await addUser(newUser);
         if (response.success) {
@@ -187,6 +195,8 @@ const Users = () => {
     } catch (error) {
       console.error("Failed to save User:", error);
     
+    }finally {
+      setLoading(false);
     }
   };
   const handleOpenConfirmModal = (rowData) => {
@@ -202,6 +212,7 @@ const handleDelete = async () => {
   if (!userToDelete) return;
     const id = userToDelete.id;
   try {
+    setLoading(true);
     const response = await deleteUser(id); 
 
     if (response.success) {
@@ -218,6 +229,7 @@ const handleDelete = async () => {
   } finally {
     setUserToDelete(null);
     setIsConfirmModalOpen(false); 
+    setLoading(false);
   }
 };
 
@@ -244,7 +256,13 @@ const handleDelete = async () => {
     const newSearchTerm = event.target.value;
     const trimmedSearchTerm = newSearchTerm.trim();
     setSearchTerm(newSearchTerm); 
-    debounceSearch(trimmedSearchTerm); 
+    if (trimmedSearchTerm.length < 3 && trimmedSearchTerm.length > 0) {
+      
+      loadUsers();
+    } else {
+    
+      debounceSearch(trimmedSearchTerm);
+    }
     
   };
 
@@ -260,7 +278,8 @@ const handleDelete = async () => {
   const handleIssuanceSubmit = async (issuanceDetails) => {
    
     try {
-     
+      
+      setLoading(true);
       const response = await createIssuance(issuanceDetails);
   
       
@@ -283,6 +302,8 @@ const handleDelete = async () => {
     } catch (error) {
       console.error("Failed to create issuance:", error);
       alert("Failed to create issuance due to a server error.");
+    }finally {
+      setLoading(false);
     }
   };
 
@@ -324,6 +345,7 @@ const handleDelete = async () => {
 
   return (
     <>
+     
       <div className="center-div">
         <div className="upper-div">
           <div className="upper-div-text">
@@ -348,10 +370,12 @@ const handleDelete = async () => {
             </div>
           </div>
         </div>
-
+        {loading ? (<Loader/>) : (
+        <div className="loader">
         <div className="lower-div">
           <Table data={users} columns={columns} />
         </div>
+        
         <div className="pagination-div">
           <div className="left-pagination">
             <img
@@ -378,6 +402,9 @@ const handleDelete = async () => {
             />
           </div>
         </div>
+      
+      </div>
+      )}
       </div>
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
         <Dynamicform
@@ -431,7 +458,8 @@ const handleDelete = async () => {
           type={toast.type} 
           onClose={() => setShowToast(false)} 
           isOpen={showToast}
-   />
+        />
+      
     </>
   );
 };

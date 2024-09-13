@@ -58,7 +58,7 @@
     max-height: 150px;
     overflow-y: auto;
     position: relative;
-    top: 100%; /* Place dropdown directly below the input */
+    top: 100%;
     left: 0;
     width: 100%;
     background-color: white;

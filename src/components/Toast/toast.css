@@ -14,11 +14,11 @@
 }
 
 .toast-success {
-  background: #28a745; /* Green */
+  background: #28a745; 
 }
 
 .toast-error {
-  background: #dc3545; /* Red */
+  background: #dc3545; 
 }
 
 .toast-message {

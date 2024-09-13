@@ -8,15 +8,17 @@ import TotalUsers from "../../assets/icons/TotalUsers.png";
 import AdminHOC from "../../hoc/AdminHOC";
 import Table from "../../components/table/table";
 import { fetchBooks } from "../../api/services/actions/bookActions";
-import { fetchAllCounts } from "../../api/services/actions/categoryActions";
+import { fetchAllCounts, fetchCategories } from "../../api/services/actions/categoryActions";
+import Loader from "../../components/loader/loader";
 
 const Dashboard = () => {
   const [userCount, setUserCount] = useState(0);
   const [categoryCount, setCategoryCount] = useState(0);
   const [bookCount, setBookCount] = useState(0);
   const [issuanceCount, setIssuanceCount] = useState(0);
-  const [tableData, setTableData] = useState([]);
-
+  const [bookstableData, setBooksTableData] = useState([]);
+  const [categoryTableData,setCategoryTableData] = useState([]);
+  const [loading,setLoading] =  useState(false);
   const [isTabletView, setIsTabletView] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
@@ -29,24 +31,44 @@ const Dashboard = () => {
   useEffect(() => {
     const getCounts = async () => {
       try {
-     
-        const counts = await fetchAllCounts();
-        
-        
-        setBookCount(counts.bookCount);
-        setCategoryCount(counts.categoryCount);
-        setUserCount(counts.userCount);
-        setIssuanceCount(counts.issuanceCount);
-
+        setLoading(true);
+        const response = await fetchAllCounts();
        
-        const booksTable = await fetchBooks(0, 15, "");
+        if(response.success) 
+        {
+
+        setBookCount(response.data.bookCount);
+        setCategoryCount(response.data.categoryCount);
+        setUserCount(response.data.userCount);
+        setIssuanceCount(response.data.issuanceCount);
+
+        }
+        else 
+        {
+          console.log("Error Fetching in Counts");
+        }
+
+        const booksResponse = await fetchBooks(0, 5, "");
+        const booksTable  =booksResponse.data;
         const transformedTable = booksTable.content.map((book, index) => ({
           ...book,
           id: index + 1,
         }));
-        setTableData(transformedTable);
+        setBooksTableData(transformedTable);
+
+        const categoryResponse = await fetchCategories(0,5,"");
+        const categoryTable = categoryResponse.data;
+        const tranformedCategoryTable = categoryTable.content.map((category ,index) => ({
+          ...category,
+          id : index +1,
+        }));
+        
+        setCategoryTableData(tranformedCategoryTable);
+        
       } catch (error) {
         console.error("Error fetching counts:", error);
+      }finally {
+        setLoading(false);
       }
     };
 
@@ -58,9 +80,16 @@ const Dashboard = () => {
     { header: "Book Title", accessor: "title", width: "7%" },
     { header: "Author", accessor: "author", width: "2%" },
   ];
+  const categorycolumns = [
+    { header: "ID", accessor: "id", width: "0.25%" },
+    { header: "Category Name", accessor: "name", width: "1%" },
+    { header: "Category Description", accessor: "categoryDesc", width: "3%" },
+   
+  ];
 
   return (
     <div className="dashboard-div">
+      {loading ? (<Loader/>) : (
       <div className="contains">
         <div className="card-table-div">
           <div className="leftdash-div">
@@ -104,16 +133,27 @@ const Dashboard = () => {
         <div className="rightdash-div">
           {!isTabletView && (
             <div className="rightdash-table">
+              <div className="table-one">
               <div className="dashborad-table-heading">
                 <p>Top Books</p>
+               </div>
+               <div className="dashboard-table">
+                <Table data={bookstableData} columns={columns} />
               </div>
-              <div className="dashboard-table">
-                <Table data={tableData} columns={columns} />
+              </div>
+              <div className="table-two">
+              <div className="dashborad-table-heading">
+                <p>Top Category</p>
+               </div>
+               <div className="dashboard-table">
+                <Table data={categoryTableData} columns={categorycolumns} />
+              </div>
               </div>
             </div>
           )}
         </div>
       </div>
+      )}
     </div>
   );
 };

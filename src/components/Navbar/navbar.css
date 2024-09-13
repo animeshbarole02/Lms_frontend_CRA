@@ -138,9 +138,9 @@
 
 
 @media (max-width: 768px) and (max-height: 1136px) {
-    /* Adjust the navbar */
+
     .navbar-div {
-        flex-direction: column; /* Stack the navbar content vertically */
+        flex-direction: column;
         padding: 5px;
         border-bottom: 1.5px solid #ff7050;
     }

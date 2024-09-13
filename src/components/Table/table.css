@@ -12,10 +12,9 @@
     
 }
 .custom-table td {
-  
-    
-  padding-left: 2%;
-  padding-right:2%
+
+ padding-left: 2%;
+ padding-right:2%
 
 }
 
@@ -45,11 +44,11 @@
 
 @media screen and (max-width: 768px) {
     .table-div {
-        overflow-x: auto; /* Enable horizontal scrolling */
+        overflow-x: auto;
     }
     
     .custom-table {
-        width: 1200px; /* Set a larger width to allow scrolling */
+        width: 1200px; 
     }
 
     .custom-table th {

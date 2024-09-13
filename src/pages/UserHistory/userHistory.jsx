@@ -38,7 +38,8 @@ const UserHistory = () => {
         if (!userId) return;
         
         try {
-          const data = await fetchUserHistoryDetails(userId, currentPage, 10);
+          const response = await fetchUserHistoryDetails(userId, currentPage, 10);
+          const data =  response.data;
           const formattedData = data.content.map((item,index) => ({
             ...item,
             id :index +1,

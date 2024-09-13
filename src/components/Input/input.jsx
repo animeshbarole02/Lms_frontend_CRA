@@ -25,7 +25,7 @@ const Input = ({ field, value, onChange, onFocus,min }) => {
       placeholder={placeholder}
       value={value}
       onChange={onChange}
-      onFocus={onFocus}
+     
       min={field.min}
     />
   );

@@ -1,4 +1,3 @@
-import "./App.css";
 import Books from "./pages/books/books";
 import Categories from "./pages/categories/categories";
 import Dashboard from "./pages/dashboard/dashboard";

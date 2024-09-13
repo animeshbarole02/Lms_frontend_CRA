@@ -10,7 +10,7 @@ export const fetchCategories = async (page = 0, size = 8, searchTerm = "") => {
       search: searchTerm,
     });
 
-    return response;
+    return { success: true, data: response}
   } catch (error) {
     console.error("Failed to Fetch Categories :", error);
     throw error;
@@ -21,7 +21,10 @@ export const fetchCategories = async (page = 0, size = 8, searchTerm = "") => {
 export const fetchAllCounts = async () => {
   try {
     const response = await get(`${CATEGORY_BASE_URL}/count/all`);
-    return response;
+
+     return { success: true, data: response}
+    
+    
   } catch (error) {
     console.error("Error fetching all counts:", error);
     throw error;
@@ -47,7 +50,7 @@ export const addCategory = async (newCategory) => {
 export const deleteCategory = async (id) => {
   try {
     const response = await del(`${CATEGORY_BASE_URL}/${id}`);
-    console.log(response);
+
 
     if (response.status === 200) {
       return { success: true, message: response.message };
@@ -92,7 +95,7 @@ export const fetchAllCategories = async () => {
   try {
     const response = await get(`${CATEGORY_BASE_URL}/getAll`);
 
-    return response;
+    return { success: true, data: response}
   } catch (error) {
     console.error("Error fetching all categories:", error);
     throw error;

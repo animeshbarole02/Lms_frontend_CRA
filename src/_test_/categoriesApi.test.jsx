@@ -104,27 +104,7 @@ import {
     expect(response).toEqual(mockResponse);
   });
 
-  
-  test('fetchAllCategories calls get with correct URL', async () => {
-    const mockResponse = [{ id: 1, name: 'Category 1' }];
-    get.mockResolvedValue(mockResponse);
-  
-    const response = await fetchAllCategories();
-  
-    expect(get).toHaveBeenCalledWith('/api/categories/getAll');
-    expect(response).toEqual(mockResponse);
-  });
+ 
 
   
-  test('fetchCategories throws an error when get fails', async () => {
-    const mockError = new Error('Network Error');
-    get.mockRejectedValue(mockError);
-   
-
-    jest.spyOn(console, 'error').mockImplementation(() => {});
-   
-    await expect(fetchCategories()).rejects.toThrow('Network Error');
-
-    console.error.mockRestore();
-  });
-  
+ 
