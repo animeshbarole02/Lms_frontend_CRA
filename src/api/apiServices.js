@@ -1,5 +1,3 @@
-
-
 import { BASE_URL } from "./apiConstants";
 
 const getAuthHeaders = () => {

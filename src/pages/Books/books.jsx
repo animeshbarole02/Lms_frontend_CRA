@@ -1,11 +1,7 @@
 import Table from "../../components/table/table";
 import { useState, useCallback, useEffect } from "react";
 import Button from "../../components/button/button";
-import SearchIcon from "../../assets/icons/magnifying-glass.png";
-import LeftPageIcon from "../../assets/icons/LeftPage.png";
-import RightPageIcon from "../../assets/icons/Right-Page.png";
 import EditIcon from "../../assets/icons/EditIcom.png";
-
 import AdminHOC from "../../hoc/AdminHOC";
 import Modal from "../../components/modal/modal";
 import Dynamicform from "../../components/forms/dynamicform";
@@ -387,7 +383,7 @@ const Books = () => {
   const handleFieldFocus = (fieldName) => {
     setErrors((prevErrors) => ({
       ...prevErrors,
-      [fieldName]: "", // Clear the error message for the focused field
+      [fieldName]: "", 
     }));
   };
 

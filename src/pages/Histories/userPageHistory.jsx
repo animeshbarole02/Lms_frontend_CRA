@@ -2,13 +2,11 @@ import React, { useState, useEffect } from "react";
 import AdminHOC from "../../hoc/AdminHOC";
 import Table from "../../components/table/table";
 import { fetchUserIssuanceDetails } from "../../api/services/actions/issuancesActions";
-import SearchIcon from "../../assets/icons/magnifying-glass.png";
-import LeftPageIcon from "../../assets/icons/LeftPage.png";
-import RightPageIcon from "../../assets/icons/Right-Page.png";
+
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   formatDateOrTime,
-  formatDateTime,
+
 } from "../../utils/formateDateOrTime";
 import BackArrow from "../../assets/icons/back.png";
 import "./historyPage.css";

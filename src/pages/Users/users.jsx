@@ -1,11 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 
 import EditIcon from "../../assets/icons/EditIcom.png";
-import SearchIcon from "../../assets/icons/magnifying-glass.png";
 import Button from "../../components/button/button";
 import Table from "../../components/table/table";
-import LeftPageIcon from "../../assets/icons/LeftPage.png";
-import RightPageIcon from "../../assets/icons/Right-Page.png";
 import AdminHOC from "../../hoc/AdminHOC";
 import Modal from "../../components/modal/modal";
 import Dynamicform from "../../components/forms/dynamicform";

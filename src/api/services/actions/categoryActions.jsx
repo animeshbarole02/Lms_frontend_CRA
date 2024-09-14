@@ -1,4 +1,3 @@
-// categoriesApi.js
 import { get, post, put, del, patch } from "../../apiServices";
 import { CATEGORY_BASE_URL } from "../../apiConstants";
 

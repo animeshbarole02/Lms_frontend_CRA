@@ -6,18 +6,16 @@ import {
 import "./issuanceform.css";
 import Button from "../button/button";
 import { formatDateTime } from "../../utils/formateDateOrTime";
-import { useNavigate } from "react-router-dom";
 import Input from "../Input/input";
 
 const UserIssuanceform = ({ onSubmit, selectedUser, onClose }) => {
   const [bookTitle, setBookTitle] = useState("");
   const [bookId, setBookId] = useState(null);
   const [issuanceType, setIssuanceType] = useState("Home");
-  const [returnDate, setReturnDate] = useState("");
   const [returnTime, setReturnTime] = useState("");
   const [issuedAt] = useState(formatDateTime(new Date().toLocaleString())); //
   const [expectedReturn, setExpectedReturn] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+ 
   const [showDropdown, setShowDropdown] = useState(false);
   const [bookSuggestions, setBookSuggestions] = useState([]);
   const [errors, setErrors] = useState({ bookTitle: "", returnDate: "" });
@@ -51,7 +49,6 @@ const UserIssuanceform = ({ onSubmit, selectedUser, onClose }) => {
   const handleSuggestionClick = (book) => {
     setBookTitle(book.title);
     setBookId(book.id);
-    setErrorMessage("");
     setShowDropdown(false);
   };
 

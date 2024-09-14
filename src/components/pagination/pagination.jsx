@@ -1,4 +1,3 @@
-// Pagination.js
 import React from 'react';
 import LeftPageIcon from "../../assets/icons/LeftPage.png";
 import RightPageIcon from "../../assets/icons/Right-Page.png";

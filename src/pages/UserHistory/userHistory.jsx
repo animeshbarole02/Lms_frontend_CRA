@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import UserHOC from "../../hoc/userHOC";
 import Table from "../../components/table/table";
-import LeftPageIcon from "../../assets/icons/LeftPage.png";
-import RightPageIcon from "../../assets/icons/Right-Page.png";
-
 import { formatDateOrTime } from "../../utils/formateDateOrTime";
 import { useSelector } from "react-redux";
 import { fetchUserHistoryDetails } from "../../api/services/actions/userhistoryActions";

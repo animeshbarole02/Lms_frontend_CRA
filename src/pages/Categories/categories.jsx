@@ -3,13 +3,9 @@ import "./categories.css";
 import { useCallback, useEffect, useState } from "react";
 import Button from "../../components/button/button";
 import EditIcon from "../../assets/icons/EditIcom.png";
-import LeftPageIcon from "../../assets/icons/LeftPage.png";
-import RightPageIcon from "../../assets/icons/Right-Page.png";
 import "../../components/toast/toast.css";
-
 import DeleteIcon from "../../assets/icons/DeleteIcon.png";
 import Table from "../../components/table/table";
-
 import AdminHOC from "../../hoc/AdminHOC";
 import Modal from "../../components/modal/modal";
 import Dynamicform from "../../components/forms/dynamicform";
@@ -45,7 +41,6 @@ const Categories = () => {
     isOpen: false,
   });
   const [errors, setErrors] = useState({ name: "", categoryDesc: "" });
-  const [searchError, setSearchError] = useState("");
   const columns = [
     { header: "ID", accessor: "displayId", width: "0.25%" },
     { header: "Category Name", accessor: "name", width: "1%" },
@@ -98,7 +93,7 @@ const Categories = () => {
     if (trimmedSearchTerm.length < 3 && trimmedSearchTerm.length > 0) {
       loadCategories();
     } else {
-      setSearchError("");
+
       debounceSearch(trimmedSearchTerm);
     }
   };

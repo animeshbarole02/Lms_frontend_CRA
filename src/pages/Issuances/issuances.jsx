@@ -1,10 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import SearchIcon from "../../assets/icons/magnifying-glass.png";
 import Table from "../../components/table/table";
 import Modal from "../../components/modal/modal";
 import Dynamicform from "../../components/forms/dynamicform";
-import LeftPageIcon from "../../assets/icons/LeftPage.png";
-import RightPageIcon from "../../assets/icons/Right-Page.png";
 import AdminHOC from "../../hoc/AdminHOC";
 import {
   fetchIssuances,
@@ -14,7 +11,7 @@ import {
 import Tooltip from "../../components/tooltip/toolTip";
 import EditIcon from "../../assets/icons/EditIcom.png";
 import DeleteIcon from "../../assets/icons/DeleteIcon.png";
-import { formatDateOrTime } from "../../utils/formateDateOrTime";
+import { formatDateOrTime, formatDateTime } from "../../utils/formateDateOrTime";
 import ConfirmationModal from "../../components/modal/confirmationModal";
 import Toast from "../../components/toast/toast";
 import debounce from "../../utils/debounce";
@@ -71,7 +68,7 @@ const Issuances = () => {
     },
   ];
 
-  //const todayDate = new Date().toISOString().split("T")[0];
+
 
   const debounceSearch = useCallback(
     debounce((newSearchTerm) => {
@@ -147,17 +144,6 @@ const Issuances = () => {
     setIsConfirmModalOpen(false);
   };
 
-  const formatDateTime = (date) => {
-    const d = new Date(date);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    const hours = String(d.getHours()).padStart(2, "0");
-    const minutes = String(d.getMinutes()).padStart(2, "0");
-    const seconds = String(d.getSeconds()).padStart(2, "0");
-
-    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
-  };
 
   const handleEditIssuance = async (issuance) => {
     const formattedDate = formatDateTime(issuance.expectedReturn);

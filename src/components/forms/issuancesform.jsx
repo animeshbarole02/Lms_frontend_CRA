@@ -3,16 +3,13 @@ import "./issuanceform.css";
 import { findUserByMobile } from "../../api/services/actions/usersActions";
 import Button from "../button/button";
 import { formatDateTime } from "../../utils/formateDateOrTime";
-import { useNavigate } from "react-router-dom";
-import { now } from "../../utils/currentDate";
 import Input from "../Input/input";
 
 const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
   const [userMobileNumber, setUserMobileNumber] = useState("");
-  const [userName, setUserName] = useState("");
+
   const [userId, setUserId] = useState(null);
   const [issuanceType, setIssuanceType] = useState("Home");
-  const [returnDate, setReturnDate] = useState("");
   const [returnTime, setReturnTime] = useState("");
   const [issuedAt] = useState(formatDateTime(new Date().toLocaleString()));
   const [expectedReturn, setExpectedReturn] = useState("");
@@ -24,7 +21,7 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
 
     if (response) {
       if (response.data && response.data.name) {
-        setUserName(response.data.name);
+      
         setUserId(response.data.id);
         setMessage(`User with Name ${response.data.name} found.`);
         setErrors((prevErrors) => ({ ...prevErrors, mobileNumber: "" }));
@@ -52,7 +49,8 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-
+    
+    setMessage("");
     if (!userMobileNumber) {
       setErrors((prevErrors) => ({
         ...prevErrors,

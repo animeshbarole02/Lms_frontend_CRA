@@ -4,8 +4,6 @@ import Table from "../../components/table/table";
 import { formatDateOrTime } from "../../utils/formateDateOrTime";
 import { fetchBookIssuanceDetails } from "../../api/services/actions/issuancesActions";
 import { useLocation, useNavigate } from "react-router-dom";
-import LeftPageIcon from "../../assets/icons/LeftPage.png";
-import RightPageIcon from "../../assets/icons/Right-Page.png";
 import BackArrow from "../../assets/icons/back.png";
 import "./historyPage.css";
 import Pagination from "../../components/pagination/pagination";

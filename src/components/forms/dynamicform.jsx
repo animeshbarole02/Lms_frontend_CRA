@@ -9,7 +9,7 @@ const DynamicForm = ({
   isEditMode,
   initialData = {},
   errors = {},
-  onFieldFocus,
+  
 }) => {
   const [formData, setFormData] = useState(initialData);
   const [fieldErrors, setFieldErrors] = useState(errors);
