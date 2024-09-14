@@ -1,4 +1,4 @@
-import  { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import SearchIcon from "../../assets/icons/magnifying-glass.png";
 import Table from "../../components/table/table";
 import Modal from "../../components/modal/modal";
@@ -21,8 +21,7 @@ import debounce from "../../utils/debounce";
 import SearchInput from "../../components/search/search";
 import { now } from "../../utils/currentDate";
 import Loader from "../../components/loader/loader";
-
-
+import Pagination from "../../components/pagination/pagination";
 
 const Issuances = () => {
   const [showToast, setShowToast] = useState(false);
@@ -33,26 +32,38 @@ const Issuances = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [editingIssuance, setEditingIssuance] = useState(null);
-  const [issuanceToDelete , setIssuanceToDelete]  = useState(null);
-  const [toast, setToast] = useState({ message: "", type: "success", isOpen: false });
-  const [loading,setLoading] = useState(false);
+  const [issuanceToDelete, setIssuanceToDelete] = useState(null);
+  const [toast, setToast] = useState({
+    message: "",
+    type: "success",
+    isOpen: false,
+  });
+  const [loading, setLoading] = useState(false);
   const columns = [
     { header: "Id", accessor: "displayId", width: "3%" },
     { header: "User", accessor: "name", width: "8%" },
     { header: "Book", accessor: "title", width: "10%" },
-    { header: "Issue", accessor: "issuedAt", 
-      
+    {
+      header: "Issue",
+      accessor: "issuedAt",
+
       width: "8%",
-      render: (rowData) => formatDateOrTime(rowData.issuedAt) 
-     },
-     {header :"Return",accessor:"expectedReturn", width:"8%",
-      render: (rowData) => formatDateOrTime(rowData.expectedReturn) 
-     },
-    
+      render: (rowData) => formatDateOrTime(rowData.issuedAt),
+    },
+    {
+      header: "Return",
+      accessor: "expectedReturn",
+      width: "8%",
+      render: (rowData) => formatDateOrTime(rowData.expectedReturn),
+    },
+
     { header: "Status", accessor: "status", width: "5%" },
-   { header: "Issuance Type",
-      render: (rowData) => rowData.issuanceType === "Home" ? "Take away" : "In House",
-      width :"5%"},
+    {
+      header: "Issuance Type",
+      render: (rowData) =>
+        rowData.issuanceType === "Home" ? "Take away" : "In House",
+      width: "5%",
+    },
     {
       header: "Actions",
       render: (rowData) => renderActions(rowData),
@@ -61,7 +72,6 @@ const Issuances = () => {
   ];
 
   //const todayDate = new Date().toISOString().split("T")[0];
-
 
   const debounceSearch = useCallback(
     debounce((newSearchTerm) => {
@@ -74,29 +84,24 @@ const Issuances = () => {
     loadIssuances(searchTerm);
   }, [currentPage]);
 
-  
-
-  
   const loadIssuances = async (search = "") => {
     try {
       setLoading(true);
       const response = await fetchIssuances(currentPage, 9, search);
       const data = response.data;
-      
+
       const startIndex = currentPage * data.size;
       const transformedIssuances = data.content.map((issuance, index) => ({
         ...issuance,
         displayId: startIndex + index + 1,
-        name: issuance.user?.name || "Unknown", 
-        title: issuance.book?.title || "Unknown", 
-
+        name: issuance.user?.name || "Unknown",
+        title: issuance.book?.title || "Unknown",
       }));
       setIssuances(transformedIssuances);
       setTotalPages(data.totalPages);
     } catch (error) {
       console.error("Failed to load issuances:", error);
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -104,27 +109,22 @@ const Issuances = () => {
   const handleSearchInputChange = (event) => {
     const newSearchTerm = event.target.value;
     const trimmedSearchTerm = newSearchTerm.trim();
-    setSearchTerm(newSearchTerm); 
+    setSearchTerm(newSearchTerm);
     if (trimmedSearchTerm.length < 3 && trimmedSearchTerm.length > 0) {
-      
       loadIssuances();
     } else {
-    
       debounceSearch(trimmedSearchTerm);
     }
-    
   };
-
-  
 
   const handleDelete = async () => {
     if (!issuanceToDelete) return;
     const id = issuanceToDelete.id;
-  
+
     try {
       setLoading(true);
       const response = await deleteIssuance(id);
-     
+
       if (response.success) {
         setIssuances(issuances.filter((issuance) => issuance.id !== id));
         setToast({ message: response.message, type: "success", isOpen: true });
@@ -135,14 +135,12 @@ const Issuances = () => {
       loadIssuances();
     } catch (error) {
       console.error("Failed to delete the issuance:", error);
-     
     } finally {
       setIssuanceToDelete(null);
       setLoading(false);
       setIsConfirmModalOpen(false);
     }
   };
-  
 
   const handleCancelDelete = () => {
     setIssuanceToDelete(null);
@@ -152,12 +150,12 @@ const Issuances = () => {
   const formatDateTime = (date) => {
     const d = new Date(date);
     const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0'); 
-    const day = String(d.getDate()).padStart(2, '0'); 
-    const hours = String(d.getHours()).padStart(2, '0'); 
-    const minutes = String(d.getMinutes()).padStart(2, '0'); 
-    const seconds = String(d.getSeconds()).padStart(2, '0');
-  
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    const hours = String(d.getHours()).padStart(2, "0");
+    const minutes = String(d.getMinutes()).padStart(2, "0");
+    const seconds = String(d.getSeconds()).padStart(2, "0");
+
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
   };
 
@@ -167,11 +165,14 @@ const Issuances = () => {
       ...issuance,
       expectedReturn: formattedDate,
     };
-  
+
     try {
       setLoading(true);
-      const response = await updateIssuance(updatedIssuance.id, updatedIssuance);
-  
+      const response = await updateIssuance(
+        updatedIssuance.id,
+        updatedIssuance
+      );
+
       if (response.success) {
         setToast({ message: response.message, type: "success", isOpen: true });
         setShowToast(true);
@@ -183,13 +184,10 @@ const Issuances = () => {
       }
     } catch (error) {
       console.error("Failed to update the issuance", error);
-
-      
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
-  
 
   const handlePageChange = (direction) => {
     if (direction === "prev" && currentPage > 0) {
@@ -199,7 +197,6 @@ const Issuances = () => {
     }
   };
 
- 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingIssuance(null);
@@ -207,16 +204,16 @@ const Issuances = () => {
 
   const renderActions = (rowData) => {
     const isEditDisabled = rowData.status === "Returned";
-  
+
     return (
       <div className="actionicons">
         <Tooltip message="Edit">
           <img
             src={EditIcon}
             alt="Edit"
-            className={`action-icon ${isEditDisabled ? 'disabled' : ''}`}
+            className={`action-icon ${isEditDisabled ? "disabled" : ""}`}
             onClick={() => !isEditDisabled && handleEdit(rowData)}
-            style={{ cursor: isEditDisabled ? 'not-allowed' : 'pointer' }}
+            style={{ cursor: isEditDisabled ? "not-allowed" : "pointer" }}
           />
         </Tooltip>
         <Tooltip message="Delete">
@@ -231,16 +228,14 @@ const Issuances = () => {
     );
   };
   const handleEdit = (rowData) => {
-   
     setEditingIssuance(rowData);
     setIsModalOpen(true);
   };
 
   const handleOpenConfirmModal = (rowData) => {
-     setIssuanceToDelete(rowData);
+    setIssuanceToDelete(rowData);
     setIsConfirmModalOpen(true);
   };
-
 
   return (
     <>
@@ -252,82 +247,56 @@ const Issuances = () => {
             </div>
 
             <div className="upper-div-btns">
-            <SearchInput
-        value={searchTerm}
-        onChange={handleSearchInputChange}
-        placeholder="Search Issuances..."
-      />
-
-            
+              <SearchInput
+                value={searchTerm}
+                onChange={handleSearchInputChange}
+                placeholder="Search Issuances..."
+              />
             </div>
           </div>
-          {loading ? (<Loader/>) : (
-          <div className="lower-div">
-            <Table data={issuances} columns={columns} />
+          {loading ? (
+            <Loader />
+          ) : (
+            <div className="lower-div">
+              <Table data={issuances} columns={columns} />
 
-            <div className="pagination-div">
-              <div className="left-pagination">
-                <img
-                  src={LeftPageIcon}
-                  alt=""
-                  onClick={() => handlePageChange("prev")}
-                />
-              </div>
-              <div className="pagination-number">
-              <span>
-                    {totalPages > 1
-                      ? `${currentPage + 1} of ${totalPages}`
-                      : totalPages === 1
-                      ? `1 of 1`
-                      : "No pages available"}
-                  </span>
-              </div>
-              <div className="right-pagination">
-                <img
-                  src={RightPageIcon}
-                  alt=""
-                  onClick={() => handlePageChange("next")}
+              <div className="pagination-div">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
                 />
               </div>
             </div>
-          </div>
-           )}
+          )}
         </div>
       </div>
       {/* Modal Component */}
-     
+
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
-        
-        <Dynamicform 
-          
-          heading={editingIssuance ?"Edit Issuance":"Add Issuance"}
+        <Dynamicform
+          heading={editingIssuance ? "Edit Issuance" : "Add Issuance"}
           fields={[
             {
-               name :"expectedReturn",
-               type:"datetime-local",
-               placeholder :"Return Time",
-               min: now,
-              
+              name: "expectedReturn",
+              type: "datetime-local",
+              placeholder: "Return Time",
+              min: now,
             },
             {
-                name: "status",
-                type: "select", 
-                placeholder: "Select Status",
-                options: [
-                  { value: "Issued", label: "Issued" },  
-                  { value: "Returned", label: "Returned" }  
-                ]
-              },
+              name: "status",
+              type: "select",
+              placeholder: "Select Status",
+              options: [
+                { value: "Issued", label: "Issued" },
+                { value: "Returned", label: "Returned" },
+              ],
+            },
           ]}
-
           onSubmit={handleEditIssuance}
           isEditMode={!!editingIssuance}
           initialData={editingIssuance}
-          
-        
         />
-
-       
       </Modal>
       <ConfirmationModal
         isOpen={isConfirmModalOpen}
@@ -335,13 +304,12 @@ const Issuances = () => {
         onConfirm={handleDelete}
         message="Are you sure you want to delete this user?"
       />
-      <Toast 
-          message={toast.message} 
-          type={toast.type} 
-          onClose={() => setShowToast(false)} 
-          isOpen={showToast}
-   />
-     
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setShowToast(false)}
+        isOpen={showToast}
+      />
     </>
   );
 };

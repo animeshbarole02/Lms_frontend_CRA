@@ -26,6 +26,7 @@ import Toast from "../../components/toast/toast";
 import debounce from "../../utils/debounce";
 import SearchInput from "../../components/search/search";
 import Loader from "../../components/loader/loader";
+import Pagination from "../../components/pagination/pagination";
 
 const Categories = () => {
   const [showToast, setShowToast] = useState(false);
@@ -80,6 +81,7 @@ const Categories = () => {
         displayId: startIndex + index + 1,
       }));
       setCategories(transformedCategories);
+
       setTotalPages(data.totalPages);
     } catch (error) {
       console.error("Failed to load categories:", error);
@@ -93,10 +95,7 @@ const Categories = () => {
     const trimmedSearchTerm = newSearchTerm.trim();
     setSearchTerm(newSearchTerm);
 
-    
-
     if (trimmedSearchTerm.length < 3 && trimmedSearchTerm.length > 0) {
-      
       loadCategories();
     } else {
       setSearchError("");
@@ -109,12 +108,12 @@ const Categories = () => {
     const categoryDesc = category.categoryDesc
       ? category.categoryDesc.trim()
       : "";
-  
+
     const isValidName = /^[A-Za-z\s]+$/.test(name);
-  
+
     let hasError = false;
     setErrors({ name: "", categoryDesc: "" });
-  
+
     if (!name) {
       setErrors({
         name: "Please enter a valid category name.",
@@ -126,7 +125,6 @@ const Categories = () => {
       });
       hasError = true;
     }
-  
 
     if (!categoryDesc) {
       setErrors((prevErrors) => ({
@@ -135,9 +133,9 @@ const Categories = () => {
       }));
       hasError = true;
     }
-  
+
     if (hasError) return;
-  
+
     try {
       let response;
       if (editingCategory) {
@@ -146,7 +144,7 @@ const Categories = () => {
           name,
           categoryDesc,
         });
-  
+
         if (response.success) {
           setToast({
             message: `Category updated: ${name}`,
@@ -177,7 +175,7 @@ const Categories = () => {
           });
         }
       }
-  
+
       setShowToast(true);
       loadCategories();
       handleCloseModal();
@@ -284,13 +282,6 @@ const Categories = () => {
     setIsModalOpen(true);
   };
 
-  const handleFieldFocus = (fieldName) => {
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      [fieldName]: "",
-    }));
-  };
-
   return (
     <>
       <div className="categories-div">
@@ -308,7 +299,6 @@ const Categories = () => {
                     onChange={handleSearchInputChange}
                     placeholder="Search categories..."
                   />
-                 
                 </div>
               </div>
 
@@ -328,29 +318,11 @@ const Categories = () => {
               <Table data={categories} columns={columns} />
 
               <div className="pagination-div">
-                <div className="left-pagination">
-                  <img
-                    src={LeftPageIcon}
-                    alt=""
-                    onClick={() => handlePageChange("prev")}
-                  />
-                </div>
-                <div className="pagination-number">
-                  <span>
-                    {totalPages > 1
-                      ? `${currentPage + 1} of ${totalPages}`
-                      : totalPages === 1
-                      ? `1 of 1`
-                      : "No pages available"}
-                  </span>
-                </div>
-                <div className="right-pagination">
-                  <img
-                    src={RightPageIcon}
-                    alt=""
-                    onClick={() => handlePageChange("next")}
-                  />
-                </div>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
               </div>
             </div>
           )}
@@ -379,7 +351,6 @@ const Categories = () => {
           isEditMode={editingCategory}
           initialData={editingCategory || {}}
           errors={errors}
-          // onFieldFocus={handleFieldFocus}
         />
       </Modal>
       <ConfirmationModal

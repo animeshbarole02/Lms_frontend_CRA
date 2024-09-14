@@ -68,13 +68,13 @@
 
 .item {
     border-radius: 8px;
-    padding: 2px; 
-    width: 15vw;
+    padding: 8px; 
+    width: 12vw;
     font-size: 16px; 
 }
 
 .item img {
-    height: 5vh;
+    height: 3.5vh;
 }
 
 .item-text {

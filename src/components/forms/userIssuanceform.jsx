@@ -7,6 +7,7 @@ import "./issuanceform.css";
 import Button from "../button/button";
 import { formatDateTime } from "../../utils/formateDateOrTime";
 import { useNavigate } from "react-router-dom";
+import Input from "../Input/input";
 
 const UserIssuanceform = ({ onSubmit, selectedUser, onClose }) => {
   const [bookTitle, setBookTitle] = useState("");
@@ -117,11 +118,10 @@ const UserIssuanceform = ({ onSubmit, selectedUser, onClose }) => {
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label>Book Title</label>
-          <input
-            type="text"
+          <Input
+            field={{ type: "text", name: "bookTitle", placeholder: "Enter Book Title" }}
             value={bookTitle}
             onChange={handleBookTitleChange}
-            placeholder="Enter Book Title"
           />
           {showDropdown && bookSuggestions.length > 0 && (
             <ul className="dropdown-suggestions">
@@ -139,27 +139,36 @@ const UserIssuanceform = ({ onSubmit, selectedUser, onClose }) => {
 
         <div className="form-group">
           <label>Issuance Type</label>
-          <select
+          <Input
+            field={{
+              type: "select",
+              name: "issuanceType",
+              placeholder: "Select Issuance Type",
+              options: [
+                { value: "Home", label: "Take Away" },
+                { value: "Library", label: "In House" },
+              ],
+            }}
             value={issuanceType}
             onChange={(e) => setIssuanceType(e.target.value)}
-          >
-            <option value="Home">Take Away</option>
-            <option value="Library">In House</option>
-          </select>
+          />
         </div>
 
         <div className="form-group">
           <label>Expected Return</label>
           {issuanceType === "Home" ? (
-            <input
-              type="datetime-local"
-              value={expectedReturn}
-              onChange={(e) => setExpectedReturn(e.target.value)}
-              min={new Date().toISOString().slice(0, 16)}
-            />
+            <Input
+            field={{
+              type: "datetime-local",
+              name: "expectedReturn",
+              min: new Date().toISOString().slice(0, 16),
+            }}
+            value={expectedReturn}
+            onChange={(e) => setExpectedReturn(e.target.value)}
+          />
           ) : (
-            <input
-              type="time"
+            <Input
+              field={{ type: "time", name: "returnTime" }}
               value={returnTime}
               onChange={(e) => setReturnTime(e.target.value)}
             />

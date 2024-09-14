@@ -16,7 +16,7 @@ import {
   deleteBook,
   updateBook,
 } from "../../api/services/actions/bookActions";
-import { fetchAllCategories} from "../../api/services/actions/categoryActions";
+import { fetchAllCategories } from "../../api/services/actions/categoryActions";
 import Tooltip from "../../components/tooltip/toolTip";
 
 import "./books.css";
@@ -28,10 +28,9 @@ import ConfirmationModal from "../../components/modal/confirmationModal";
 import debounce from "../../utils/debounce";
 import SearchInput from "../../components/search/search";
 import Loader from "../../components/loader/loader";
-
+import Pagination from "../../components/pagination/pagination";
 
 const Books = () => {
-
   const navigate = useNavigate();
 
   const [showToast, setShowToast] = useState(false);
@@ -46,14 +45,24 @@ const Books = () => {
   const [selectedBook, setSelectedBook] = useState(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false); // Add state for confirm modal
   const [bookToDelete, setBookToDelete] = useState(null); // Add state for book to delete
-  const [toast, setToast] = useState({ message: "", type: "success", isOpen: false });
-  const [errors,setErrors] = useState({ title: "", author:"", categoryId:"",quantity: ""});
-  const [rowsPerPage, setRowsPerPage] = useState(window.innerWidth <= 768 ? 15 : 9);
-  const [loading,setLoading] =  useState(false);
+  const [toast, setToast] = useState({
+    message: "",
+    type: "success",
+    isOpen: false,
+  });
+  const [errors, setErrors] = useState({
+    title: "",
+    author: "",
+    categoryId: "",
+    quantity: "",
+  });
+  const [rowsPerPage, setRowsPerPage] = useState(
+    window.innerWidth <= 768 ? 15 : 9
+  );
+  const [loading, setLoading] = useState(false);
 
   const columns = [
-    { header: "ID", accessor: "displayId", 
-      width: "2%" },
+    { header: "ID", accessor: "displayId", width: "2%" },
     { header: "Title", accessor: "title", width: "10%" },
     { header: "Author", accessor: "author", width: "8%" },
     { header: "Category", accessor: "categoryName", width: "6%" },
@@ -67,8 +76,7 @@ const Books = () => {
             text="Issue"
             className="action-button issue-button"
             onClick={() => handleIssue(rowData)}
-            disabled={rowData.quantity === 0} 
-           
+            disabled={rowData.quantity === 0}
           />
           <Button
             text="History"
@@ -84,22 +92,14 @@ const Books = () => {
       render: (rowData) => renderActions(rowData),
       width: "1%",
     },
-    
   ];
-
-
-
-  
-
 
   const debounceSearch = useCallback(
     debounce((newSearchTerm) => {
       loadBooks(newSearchTerm);
-    }, 1000), 
+    }, 1000),
     []
   );
-
- 
 
   useEffect(() => {
     loadBooks();
@@ -108,23 +108,21 @@ const Books = () => {
     const handleResize = () => {
       setRowsPerPage(window.innerWidth <= 768 ? 16 : 9);
     };
-  
+
     window.addEventListener("resize", handleResize);
-  
+
     handleResize();
-  
+
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-   
-  
   }, [currentPage]);
 
   const loadBooks = async (search = "") => {
     try {
       setLoading(true);
       const response = await fetchBooks(currentPage, rowsPerPage, search);
-      const data =  response.data;
+      const data = response.data;
       const startIndex = currentPage * data.size;
       const transformedBooks = data.content.map((book, index) => ({
         ...book,
@@ -135,162 +133,164 @@ const Books = () => {
       setTotalPages(data.totalPages);
     } catch (error) {
       console.error("Failed to load books:", error);
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
 
-const fetchCategories = async () => {
+  const fetchCategories = async () => {
     try {
       setLoading(true);
-      const categoryList = await fetchAllCategories(); 
+      const categoryList = await fetchAllCategories();
       setCategories(categoryList.data);
     } catch (error) {
       console.error("Failed to load categories:", error);
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
 
- 
+  const handleAddBook = async (newBook) => {
+    let hadError = false;
 
-const handleAddBook = async (newBook) => {
- 
+    setErrors({ title: "", author: "", categoryId: "", quantity: "" });
 
-  let hadError = false;
+    const title = newBook.title ? newBook.title.trim() : "";
+    const author = newBook.author ? newBook.author.trim() : "";
+    const categoryId = newBook.categoryId || "";
+    const quantity = newBook.quantity ? parseInt(newBook.quantity, 10) : null;
 
-
-  setErrors({ title: "", author: "", categoryId: "", quantity: "" });
-
-
-  const title = newBook.title ? newBook.title.trim() : "";
-  const author = newBook.author ? newBook.author.trim() : "";
-  const categoryId = newBook.categoryId || "";
-  const quantity = newBook.quantity ? parseInt(newBook.quantity, 10) : null;
-
-  if (!title) {
-    setErrors((prevErrors) => ({ ...prevErrors, title: "Book title is required." }));
-    hadError = true;
-  }
-  if (!author) {
-    setErrors((prevErrors) => ({ ...prevErrors, author: "Author name is required." }));
-    hadError = true;
-  }
-  if (!categoryId) {
-    setErrors((prevErrors) => ({ ...prevErrors, categoryId: "Category is required." }));
-    hadError = true;
-  }
-  if (quantity === null || isNaN(quantity) || quantity <= 0) {
-    setErrors((prevErrors) => ({ ...prevErrors, quantity: "Quantity must be a positive number." }));
-    hadError = true;
-  }
-
-  if (hadError) {
-    return; 
-  }
-
-  const bookToCreate = {
-    title: newBook.title.trim(),
-    author: newBook.author.trim(),
-    categoryId: newBook.categoryId,
-    quantity: parseInt(newBook.quantity),
-  };
-
-  try {
-    let response;
-    if (editingBook) {
-      setLoading(true);
-      response = await updateBook(newBook.id, bookToCreate);
-      if (response.success) {
-        setToast({ message: `Book updated: ${bookToCreate.title}`, type: "success", isOpen: true });
-      } else {
-        setToast({ message: response.message, type: "error", isOpen: true });
-      }
-      setEditingBook(null);
-    } else {
-      setLoading(true);
-        response = await createBook(bookToCreate);
-      if (response.success) {
-        setToast({ message: `Book added: ${bookToCreate.title}`, type: "success", isOpen: true });
-      } else {
-        setToast({ message: response.message, type: "error", isOpen: true });
-      }
+    if (!title) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        title: "Book title is required.",
+      }));
+      hadError = true;
+    }
+    if (!author) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        author: "Author name is required.",
+      }));
+      hadError = true;
+    }
+    if (!categoryId) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        categoryId: "Category is required.",
+      }));
+      hadError = true;
+    }
+    if (quantity === null || isNaN(quantity) || quantity <= 0) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        quantity: "Quantity must be a positive number.",
+      }));
+      hadError = true;
     }
 
-    setShowToast(true);
-    loadBooks();
-    handleCloseModal();
-  } catch (error) {
-    console.error("Failed to add book:", error);
-   
-   
-  }finally {
-    setLoading(true);
-  }
-};
+    if (hadError) {
+      return;
+    }
 
-const handleDelete = async () => {
-  if (!bookToDelete) return;
+    const bookToCreate = {
+      title: newBook.title.trim(),
+      author: newBook.author.trim(),
+      categoryId: newBook.categoryId,
+      quantity: parseInt(newBook.quantity),
+    };
 
-  const id = bookToDelete.id;
+    try {
+      let response;
+      if (editingBook) {
+        setLoading(true);
+        response = await updateBook(newBook.id, bookToCreate);
+        if (response.success) {
+          setToast({
+            message: `Book updated: ${bookToCreate.title}`,
+            type: "success",
+            isOpen: true,
+          });
+        } else {
+          setToast({ message: response.message, type: "error", isOpen: true });
+        }
+        setEditingBook(null);
+      } else {
+        setLoading(true);
+        response = await createBook(bookToCreate);
+        if (response.success) {
+          setToast({
+            message: `Book added: ${bookToCreate.title}`,
+            type: "success",
+            isOpen: true,
+          });
+        } else {
+          setToast({ message: response.message, type: "error", isOpen: true });
+        }
+      }
 
-  try {
-     
-    setLoading(true);
-    const response = await deleteBook(id);
-
-
-    if (response.success) {
-      setToast({
-        message: "Book deleted successfully.",
-        type: "success",
-        isOpen: true,
-      });
       setShowToast(true);
       loadBooks();
-    } else {
+      handleCloseModal();
+    } catch (error) {
+      console.error("Failed to add book:", error);
+    } finally {
+      setLoading(true);
+    }
+  };
 
+  const handleDelete = async () => {
+    if (!bookToDelete) return;
+
+    const id = bookToDelete.id;
+
+    try {
+      setLoading(true);
+      const response = await deleteBook(id);
+
+      if (response.success) {
+        setToast({
+          message: "Book deleted successfully.",
+          type: "success",
+          isOpen: true,
+        });
+        setShowToast(true);
+        loadBooks();
+      } else {
+        setToast({
+          message: response.message,
+          type: "error",
+          isOpen: true,
+        });
+        setShowToast(true);
+      }
+    } catch (error) {
+      console.error("Failed to delete the book", error);
       setToast({
-        message: response.message,
+        message: "Failed to delete the book due to a server error.",
         type: "error",
         isOpen: true,
       });
       setShowToast(true);
+    } finally {
+      setLoading(false);
+      setBookToDelete(null);
+      setIsConfirmModalOpen(false);
     }
-  } catch (error) {
-
-    console.error("Failed to delete the book", error);
-    setToast({
-      message: "Failed to delete the book due to a server error.",
-      type: "error",
-      isOpen: true,
-    });
-    setShowToast(true);
-  } finally {
-    setLoading(false);
-    setBookToDelete(null);
-    setIsConfirmModalOpen(false);
-  }
-};
-  
+  };
 
   const handleSearchInputChange = (event) => {
     const newSearchTerm = event.target.value;
 
     const trimmedSearchTerm = newSearchTerm.trim();
-    
-    setSearchTerm(newSearchTerm); 
-  
-  
+
+    setSearchTerm(newSearchTerm);
 
     if (trimmedSearchTerm.length < 3 && trimmedSearchTerm.length > 0) {
-      
       loadBooks();
     } else {
-    
       debounceSearch(trimmedSearchTerm);
     }
-    
   };
 
   const handlePageChange = (direction) => {
@@ -321,82 +321,55 @@ const handleDelete = async () => {
   };
 
   const handleHistory = (rowData) => {
-   
-    navigate('/bookHistory' ,{state : {bookId : rowData.id ,
-        bookName:rowData.title
-    } 
-       
+    navigate("/bookHistory", {
+      state: { bookId: rowData.id, bookName: rowData.title },
     });
-    
-  }
-
- 
+  };
 
   const handleIssuanceSubmit = async (issuanceDetails) => {
-   
     try {
-      
       setLoading(true);
       const response = await createIssuance(issuanceDetails);
-  
-      
+
       if (response.success) {
         setToast({ message: response.message, type: "success", isOpen: true });
         setShowToast(true);
-      
-       
+
         setTimeout(() => {
           navigate("/issuances");
         }, 1000);
       } else {
-       
         setToast({ message: response.message, type: "error", isOpen: true });
         setShowToast(true);
       }
-  
-    
+
       loadBooks();
     } catch (error) {
       console.error("Failed to create issuance:", error);
       alert("Failed to create issuance due to a server error.");
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
 
-  const handleIssue = (rowData)=> {
-
+  const handleIssue = (rowData) => {
     setSelectedBook(rowData);
     setIsIssuanceModalOpen(true);
-
-
-    
-  }
-
-
-
-
+  };
 
   const handleEdit = (rowData) => {
-
-
-    setEditingBook(rowData)
+    setEditingBook(rowData);
     setIsModalOpen(true);
-     
   };
 
   const renderActions = (rowData) => (
-   
     <div className="actionicons">
-      
       <Tooltip message="Edit">
         <img
           src={EditIcon}
           alt="Edit"
           className="action-icon"
-          
           onClick={() => handleEdit(rowData)}
-          
         />
       </Tooltip>
 
@@ -409,8 +382,6 @@ const handleDelete = async () => {
         />
       </Tooltip>
     </div>
-
-  
   );
 
   const handleFieldFocus = (fieldName) => {
@@ -420,145 +391,115 @@ const handleDelete = async () => {
     }));
   };
 
-
   return (
     <>
-    <div className="bookspage-div">
-      <div className="center-div">
-        <div className="upper-div">
-          <div className="upper-div-text">
-            <span>Books</span>
-          </div>
-
-          <div className="upper-div-btns">
-            <div className="upper-search-div">
-
-            <SearchInput
-        value={searchTerm}
-        onChange={handleSearchInputChange}
-        placeholder="Search Books..."
-      />
-         
+      <div className="bookspage-div">
+        <div className="center-div">
+          <div className="upper-div">
+            <div className="upper-div-text">
+              <span>Books</span>
             </div>
 
-            <div className="add-categories-div">
-              <Button
-                text="Add Book"
-                className="add-categories-btn"
-                onClick={handleOpenModal}
-              />
+            <div className="upper-div-btns">
+              <div className="upper-search-div">
+                <SearchInput
+                  value={searchTerm}
+                  onChange={handleSearchInputChange}
+                  placeholder="Search Books..."
+                />
+              </div>
+
+              <div className="add-categories-div">
+                <Button
+                  text="Add Book"
+                  className="add-categories-btn"
+                  onClick={handleOpenModal}
+                />
+              </div>
             </div>
           </div>
-        </div>
-        {loading ? (<Loader/>) : (
-        <div className="lower-div">
-          <Table data={books} columns={columns} />
-        </div>
-        )}
-        <div className="pagination-div">
-          <div className="left-pagination">
-            <img
-              src={LeftPageIcon}
-              alt=""
-              onClick={() => handlePageChange("prev")}
-            />
-          </div>
-          <div className="pagination-number">
-            <span>
-            
-                    {totalPages > 1
-                      ? `${currentPage + 1} of ${totalPages}`
-                      : totalPages === 1
-                      ? `1 of 1`
-                      : "No pages available"}
-                  </span>
-            
-          </div>
-          <div className="right-pagination">
-            <img
-              src={RightPageIcon}
-              alt=""
-              onClick={() => handlePageChange("next")}
+          {loading ? (
+            <Loader />
+          ) : (
+            <div className="lower-div">
+              <Table data={books} columns={columns} />
+            </div>
+          )}
+          <div className="pagination-div">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
             />
           </div>
         </div>
-      </div>
 
-      
+        <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+          <Dynamicform
+            heading={editingBook ? "Edit Book" : "Add Book"}
+            fields={[
+              {
+                name: "title",
+                type: "text",
+                placeholder: "Book Title",
+              },
+              {
+                name: "author",
+                type: "text",
+                placeholder: "Author Name",
+              },
+              {
+                name: "categoryId",
+                type: "select",
+                placeholder: "Select Book Category",
 
-      <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
-        <Dynamicform
-           heading={editingBook ? "Edit Book" : "Add Book"}
-          fields={[
-            {
-              name: "title",
-              type: "text",
-              placeholder: "Book Title",
-             
-            
-            },
-            {
-              name: "author",
-              type: "text",
-              placeholder: "Author Name",
-             
-             
-            },
-            {
-              name: "categoryId",
-              type: "select", 
-              placeholder: "Select Book Category",
-             
-              options: categories.map((category) => ({
-                value: category.id,
-                label: category.name,
-              })),
-            },
-            {
-              name: "quantity",
-              type: "number",
-              placeholder: "Enter Quantity",
-             
-            },
-          ]}
-          onSubmit={handleAddBook}
-          isEditMode={editingBook}
-          initialData={{
-            ...editingBook,
-            categoryId: editingBook?.category?.id || "", 
-          }}
-          errors={errors}
-          onFieldFocus={handleFieldFocus}
-          
-        />
-      </Modal>
+                options: categories.map((category) => ({
+                  value: category.id,
+                  label: category.name,
+                })),
+              },
+              {
+                name: "quantity",
+                type: "number",
+                placeholder: "Enter Quantity",
+              },
+            ]}
+            onSubmit={handleAddBook}
+            isEditMode={editingBook}
+            initialData={{
+              ...editingBook,
+              categoryId: editingBook?.category?.id || "",
+            }}
+            errors={errors}
+            onFieldFocus={handleFieldFocus}
+          />
+        </Modal>
 
-
-      <Modal isOpen={isIssuanceModalOpen} onClose={() => setIsIssuanceModalOpen(false)}>
-        <IssuanceForm
-          onSubmit={handleIssuanceSubmit}
-          selectedBook={selectedBook}
-        
+        <Modal
+          isOpen={isIssuanceModalOpen}
           onClose={() => setIsIssuanceModalOpen(false)}
+        >
+          <IssuanceForm
+            onSubmit={handleIssuanceSubmit}
+            selectedBook={selectedBook}
+            onClose={() => setIsIssuanceModalOpen(false)}
+          />
+        </Modal>
+
+        <ConfirmationModal
+          isOpen={isConfirmModalOpen}
+          onClose={handleCancelDelete}
+          onConfirm={handleDelete}
+          message="Are you sure you want to delete this Book?"
         />
-      </Modal>
 
-      <ConfirmationModal
-        isOpen={isConfirmModalOpen}
-        onClose={handleCancelDelete}
-        onConfirm={handleDelete}
-        message="Are you sure you want to delete this Book?"
-      />
-
-
-      <Toast
-     message={toast.message} 
-     type={toast.type} 
-     onClose={() => setShowToast(false)} 
-     isOpen={showToast}
-   />
-   </div>
-
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setShowToast(false)}
+          isOpen={showToast}
+        />
+      </div>
     </>
   );
 };

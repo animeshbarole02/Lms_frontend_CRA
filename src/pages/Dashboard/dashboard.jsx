@@ -135,7 +135,7 @@ const Dashboard = () => {
             <div className="rightdash-table">
               <div className="table-one">
               <div className="dashborad-table-heading">
-                <p>Top Books</p>
+                <p>Newly Added Books</p>
                </div>
                <div className="dashboard-table">
                 <Table data={bookstableData} columns={columns} />
@@ -143,7 +143,7 @@ const Dashboard = () => {
               </div>
               <div className="table-two">
               <div className="dashborad-table-heading">
-                <p>Top Category</p>
+                <p>Newly Added Category</p>
                </div>
                <div className="dashboard-table">
                 <Table data={categoryTableData} columns={categorycolumns} />

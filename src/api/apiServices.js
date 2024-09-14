@@ -34,7 +34,7 @@ const handleResponse = async (response) => {
 
 export const get = async (url, params = {}) => {
   const queryString = new URLSearchParams(params).toString();
-  const response = await fetch(`${BASE_URL}${url}?${queryString}`, {
+  const response = await fetch(`${BASE_URL}${url}${queryString ? ("?" + queryString) : ''}`, {
     method: "GET",
     headers: getAuthHeaders(),
   });

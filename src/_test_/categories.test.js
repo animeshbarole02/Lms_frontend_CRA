@@ -1,8 +1,8 @@
 import React from 'react';
-import { render, screen, waitFor, fireEvent, act, findByAltText } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, act, findByAltText, renderHook } from '@testing-library/react';
 import Categories from '../pages/categories/categories';
+import { useState } from 'react';
 import { fetchCategories, deleteCategory ,addCategory ,updateCategory} from '../api/services/actions/categoryActions';
-import userEvent from '@testing-library/user-event';
 
 
 
@@ -12,6 +12,7 @@ jest.mock('../api/services/actions/categoryActions', () => ({
   deleteCategory: jest.fn(),
   addCategory:jest.fn(),
   updateCategory:jest.fn(),
+  useState: jest.fn()
 }));
 
 jest.mock('../hoc/AdminHOC', () => (Component) => (props) => <Component {...props} />);
@@ -129,48 +130,10 @@ describe('Categories component', () => {
       });
     });
 
-    it('should handle form submission for editing a category', async () => {
-      const updateCategoryMock = jest.fn().mockResolvedValue({ success: true });
     
-      jest.spyOn(require('../api/services/actions/categoryActions'), 'updateCategory').mockImplementation(updateCategoryMock);
-    
-      render(<Categories />);
-    
-      // Mock category data
-      const category = { id: 1, name: 'Category 1', categoryDesc: 'Description 1' };
-      
-      // Ensure the edit icon is rendered and correctly selected
-      const editIcon = screen.getByAltText('Edit'); // Correct alt text for the edit icon
-      
-      // Hover over the edit icon to show tooltip
-      fireEvent.mouseOver(editIcon);
-    
-      // Verify tooltip appears (adjust the text as needed)
-      await waitFor(() => {
-        expect(screen.getByText('Edit')).toBeInTheDocument();
-      });
-    
-      // Click the edit icon to open the modal
-      fireEvent.click(editIcon);
-    
-      // Verify modal content
-      await waitFor(() => {
-        expect(screen.getByRole('heading', { name: 'Edit Category' })).toBeInTheDocument();
-      });
-    
-      // Pre-fill the form with the category data
-      fireEvent.change(screen.getByPlaceholderText('Category Name'), { target: { value: category.name } });
-      fireEvent.change(screen.getByPlaceholderText('Category Description'), { target: { value: category.categoryDesc } });
-    
-      fireEvent.click(screen.getByRole('button', { name: 'Save' }));
-    
-      await waitFor(() => {
-        expect(updateCategoryMock).toHaveBeenCalledWith(category.id, { name: category.name, categoryDesc: category.categoryDesc });
-      });
-    });
-  
-   
   });
+   
+
   
   describe('search functionality', () => {
     it('should debounce and fetch categories with the correct search term', async () => {
@@ -223,7 +186,215 @@ describe('Categories component', () => {
       });
     });
   });
-  
+
   
 
+  
+
+  
+  describe('Categories component', () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+  
+    test('should show an error toast if the delete fails', async () => {
+     
+      const mockCategories = [
+        { id: 1, displayId: 1, name: 'Category 1', categoryDesc: 'Description 1' }
+      ];
+  
+    
+      fetchCategories.mockResolvedValue({
+        data: {
+          content: mockCategories,
+          totalPages: 1,
+          size: 1,
+        }
+      });
+  
+     
+      deleteCategory.mockResolvedValue({ success: false, message: 'Failed to delete' });
+  
+      render(<Categories />);
+ 
+      await waitFor(() => {
+       
+        const rows = screen.getAllByRole('row');
+        expect(rows.length).toBeGreaterThan(1); 
+      });
+  
+     
+      await waitFor(() => {
+        const deleteButtons = screen.getAllByAltText('Delete');
+        expect(deleteButtons.length).toBeGreaterThan(0); 
+      });
+  
+   
+      const deleteButton = screen.getAllByAltText('Delete')[0];
+      fireEvent.click(deleteButton);
+  
+     
+      const confirmButton = screen.getByText('Yes'); 
+      fireEvent.click(confirmButton);
+  
+ 
+      await waitFor(() => {
+        expect(screen.getByText('Failed to delete')).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('modal Edit operations', () => {
+    it('should handle form submission for editing a category', async () => {
+      const updateCategoryMock = jest.fn().mockResolvedValue({ success: true });
+      
+      jest.spyOn(require('../api/services/actions/categoryActions'), 'updateCategory').mockImplementation(updateCategoryMock);
+  
+      const mockCategories = [
+        { id: 1, displayId: 1, name: 'Category 1', categoryDesc: 'Description 1' }
+      ];
+  
+      fetchCategories.mockResolvedValue({
+        data: {
+          content: mockCategories,
+          totalPages: 1,
+          size: 1,
+        }
+      });
+  
+      render(<Categories />);
+  
+    
+      await waitFor(() => {
+        const rows = screen.getAllByRole('row');
+        expect(rows.length).toBeGreaterThan(1); 
+      });
+  
+      // Open the edit modal
+      fireEvent.click(screen.getAllByAltText('Edit')[0]);
+  
+      await waitFor(() => {
+        expect(screen.getByRole('heading', { name: 'Edit Category' })).toBeInTheDocument();
+      });
+  
+      fireEvent.change(screen.getByPlaceholderText('Category Name'), { target: { value: 'Updated Category' } });
+      fireEvent.change(screen.getByPlaceholderText('Category Description'), { target: { value: 'Updated Description' } });
+  
+      fireEvent.click(screen.getByRole('button', { name: 'Edit' })); 
+  
+      await waitFor(() => {
+        expect(updateCategoryMock).toHaveBeenCalledWith(1, { name: 'Updated Category', categoryDesc: 'Updated Description' });
+      });
+  
+
+      await waitFor(() => {
+        expect(screen.getByText('Category updated: Updated Category')).toBeInTheDocument();
+      });
+    });
+  });
+   
+
+ 
+describe('Delete Modal component', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should reset categoryToDelete and close the confirmation modal when handleCancelDelete is called', async () => {
+    const mockCategories = [
+      { id: 1, displayId: 1, name: 'Category 1', categoryDesc: 'Description 1' }
+    ];
+
+    fetchCategories.mockResolvedValue({
+      data: {
+        content: mockCategories,
+        totalPages: 1,
+        size: 1,
+      }
+    });
+
+    render(<Categories />);
+
+  
+    await waitFor(() => {
+     
+      const rows = screen.getAllByRole('row');
+      expect(rows.length).toBeGreaterThan(1);
+    });
+
+    await waitFor(() => {
+      const deleteButtons = screen.getAllByAltText('Delete');
+      expect(deleteButtons.length).toBeGreaterThan(0);
+    });
+
+  
+    const deleteButton = screen.getAllByAltText('Delete')[0];
+    fireEvent.click(deleteButton);
+
+   
+    const deleteModalText = "Are you sure you want to delete this category?";
+    expect(screen.getByText(deleteModalText)).toBeInTheDocument();
+
+  
+    fireEvent.click(screen.getByText('No'));
+
+    await waitFor(() => {
+     
+      expect(screen.queryByText(deleteModalText)).not.toBeInTheDocument();
+    });
+  });
 });
+
+  describe('handleDelete component', () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+  
+    test('should show an error toast if the delete fails', async () => {
+      const mockCategories = [
+        { id: 1, displayId: 1, name: 'Category 1', categoryDesc: 'Description 1' }
+      ];
+  
+
+      fetchCategories.mockResolvedValue({
+        data: {
+          content: mockCategories,
+          totalPages: 1,
+          size: 1,
+        }
+      });
+  
+   
+      deleteCategory.mockResolvedValue({ success: false, message: 'Failed to delete' });
+  
+      render(<Categories />);
+  
+    
+      await waitFor(() => {
+       
+        const rows = screen.getAllByRole('row');
+        expect(rows.length).toBeGreaterThan(1);
+      });
+  
+      await waitFor(() => {
+        const deleteButtons = screen.getAllByAltText('Delete');
+        expect(deleteButtons.length).toBeGreaterThan(0); 
+      });
+  
+   
+      const deleteButton = screen.getAllByAltText('Delete')[0];
+      fireEvent.click(deleteButton);
+  
+      
+      const confirmButton = screen.getByText('Yes'); 
+      fireEvent.click(confirmButton);
+  
+
+      await waitFor(() => {
+        expect(screen.getByText('Failed to delete')).toBeInTheDocument();
+      });
+    });
+  });
+  
+});
+

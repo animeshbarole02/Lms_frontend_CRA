@@ -1,6 +1,6 @@
 import "./table.css";
 
-const Table = ({ data, columns }) => {
+const Table = ({ data =[], columns }) => {
   return (
     <div className={`table-div`}>
       <table className={`custom-table `}>

@@ -5,6 +5,7 @@ import Button from "../button/button";
 import { formatDateTime } from "../../utils/formateDateOrTime";
 import { useNavigate } from "react-router-dom";
 import { now } from "../../utils/currentDate";
+import Input from "../Input/input";
 
 const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
   const [userMobileNumber, setUserMobileNumber] = useState("");
@@ -20,20 +21,18 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
 
   const fetchUserDetails = async (mobileNumber) => {
     const response = await findUserByMobile(mobileNumber);
-  
+
     if (response) {
-    
       if (response.data && response.data.name) {
         setUserName(response.data.name);
         setUserId(response.data.id);
         setMessage(`User with Name ${response.data.name} found.`);
         setErrors((prevErrors) => ({ ...prevErrors, mobileNumber: "" }));
       } else {
-       
         setUserId(null);
         setMessage("User not found. Please register first.");
       }
-    } 
+    }
   };
   const handleMobileNumberChange = (e) => {
     const mobileNumber = e.target.value;
@@ -48,44 +47,43 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
 
     if (mobileNumber.length === 10) {
       fetchUserDetails(mobileNumber);
-    } 
+    }
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
 
-  if (!userMobileNumber) {
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      mobileNumber: "Mobile number is required.",
-    }));
-    return; 
-  }
+    if (!userMobileNumber) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        mobileNumber: "Mobile number is required.",
+      }));
+      return;
+    }
 
+    if (!userId) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        mobileNumber: "Please enter a valid mobile number and try again.",
+      }));
+      return;
+    }
 
-  if (!userId) {
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      mobileNumber: "Please enter a valid mobile number and try again.",
-    }));
-    return;
-  }
+    if (issuanceType === "Home" && !expectedReturn) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        returnDate: "Expected return date is required.",
+      }));
+      return;
+    }
 
-  if (issuanceType === "Home" && !expectedReturn) {
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      returnDate: "Expected return date is required.",
-    }));
-    return;
-  }
-
-  if (issuanceType === "Library" && !returnTime) {
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      returnDate: "Expected return time is required.",
-    }));
-    return;
-  }
+    if (issuanceType === "Library" && !returnTime) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        returnDate: "Expected return time is required.",
+      }));
+      return;
+    }
     let returnedAt = null;
 
     if (issuanceType === "Home" && expectedReturn) {
@@ -115,61 +113,78 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
     <div className="issuance-form">
       <h2>
         Issue Book <br></br>
-        <span style={{ color: 'black' }}>{selectedBook.title}</span>
+        <span style={{ color: "black" }}>{selectedBook.title}</span>
       </h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label>Mobile Number</label>
-          <input
-            type="text"
+          <Input
+            field={{
+              type: "text",
+              name: "mobileNumber",
+              placeholder: "Enter User Mobile Number",
+            }}
             value={userMobileNumber}
             onChange={handleMobileNumberChange}
-            placeholder="Enter User Mobile Number"
           />
-            {errors.mobileNumber && <p className="error-message">{errors.mobileNumber}</p>}
- {message && (
-    <p
-      className={`message ${userId ? "success-message" : "error-message"}`}
-    >
-      {message}
-    </p>
-  )}
+          {errors.mobileNumber && (
+            <p className="error-message">{errors.mobileNumber}</p>
+          )}
+          {message && (
+            <p
+              className={`message ${
+                userId ? "success-message" : "error-message"
+              }`}
+            >
+              {message}
+            </p>
+          )}
         </div>
 
         <div className="form-group">
           <label>Issuance Type</label>
-          <select
+          <Input
+            field={{
+              type: "select",
+              name: "issuanceType",
+              placeholder: "Select Issuance Type",
+              options: [
+                { value: "Home", label: "Take Away" },
+                { value: "Library", label: "In House" },
+              ],
+            }}
             value={issuanceType}
             onChange={(e) => setIssuanceType(e.target.value)}
-          >
-            <option value="Home">Take Away</option>
-            <option value="Library">In House</option>
-          </select>
+          />
         </div>
 
         <div className="form-group">
           <label>Expected Return</label>
           {issuanceType === "Home" ? (
             <>
-              <input
-                type="datetime-local"
+              <Input
+                field={{
+                  type: "datetime-local",
+                  name: "expectedReturn",
+                  min: new Date().toISOString().slice(0, 16),
+                }}
                 value={expectedReturn}
                 onChange={(e) => setExpectedReturn(e.target.value)}
-                min={new Date().toISOString().slice(0, 16)}
               />
-
               {errors.returnDate && (
                 <p className="error-message">{errors.returnDate}</p>
               )}
             </>
           ) : (
             <>
-              <input
-                type="time"
+              <Input
+                field={{ type: "time", name: "returnTime" }}
                 value={returnTime}
                 onChange={(e) => setReturnTime(e.target.value)}
               />
-              {errors.returnDate && <p className="error-message">{errors.returnDate}</p>}
+              {errors.returnDate && (
+                <p className="error-message">{errors.returnDate}</p>
+              )}
             </>
           )}
         </div>
