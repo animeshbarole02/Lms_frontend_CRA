@@ -20,7 +20,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "coverage": "react-scripts test --env=jsdom --watchAll=false --coverage"
+    "coverage": "react-scripts test --env=jsdom --watchAll=false --coverage --collectCoverageFrom='src/pages/categories/categories.jsx'  --collectCoverageFrom='src/components/modal/confirmationModal.jsx' --collectCoverageFrom='src/components/forms/dynamicform.jsx' --collectCoverageFrom='src/components/modal/modal.jsx' --collectCoverageFrom='src/components/pagination/pagination.jsx' --collectCoverageFrom='src/components/search/search.jsx' --collectCoverageFrom='src/components/table/table.jsx' --collectCoverageFrom='src/components/toast/toast.jsx' --collectCoverageFrom='src/components/tooltip/toolTip.jsx' "
   },
   "eslintConfig": {
     "extends": [

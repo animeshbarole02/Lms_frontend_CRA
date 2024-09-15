@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Button from "../button/button";
-import Input from "../Input/input"; 
+import Input from "../input/input"; 
 
 const DynamicForm = ({
   fields,
@@ -63,6 +63,7 @@ const DynamicForm = ({
           
           {fields.map((field) => (
             <div key={field.name} className="modal-form-input">
+            {field.label && <label className="dynamic-form-label" htmlFor={field.name}>{field.label}</label>}
              {field.type === "select" ? (
                 <select
                   name={field.name}

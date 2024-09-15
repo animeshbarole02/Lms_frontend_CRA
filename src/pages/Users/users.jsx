@@ -378,16 +378,19 @@ const Users = () => {
             {
               name: "name",
               type: "text",
+              label:"Name",
               placeholder: "User Name",
             },
             {
               name: "email",
               type: "email",
+              label:"Email",
               placeholder: "User Email",
             },
             {
               name: "phoneNumber",
               type: "tel",
+              label:"Phone-Number",
               placeholder: "Phone Number",
             },
           ]}

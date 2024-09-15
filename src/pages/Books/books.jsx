@@ -444,16 +444,19 @@ const Books = () => {
               {
                 name: "title",
                 type: "text",
+                label:"Title",
                 placeholder: "Book Title",
               },
               {
                 name: "author",
                 type: "text",
+                label:"Author",
                 placeholder: "Author Name",
               },
               {
                 name: "categoryId",
                 type: "select",
+                label:"Category",
                 placeholder: "Select Book Category",
 
                 options: categories.map((category) => ({
@@ -464,6 +467,7 @@ const Books = () => {
               {
                 name: "quantity",
                 type: "number",
+                label:"Quantity",
                 placeholder: "Enter Quantity",
               },
             ]}

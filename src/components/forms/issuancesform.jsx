@@ -3,7 +3,7 @@ import "./issuanceform.css";
 import { findUserByMobile } from "../../api/services/actions/usersActions";
 import Button from "../button/button";
 import { formatDateTime } from "../../utils/formateDateOrTime";
-import Input from "../Input/input";
+import Input from "../input/input";
 
 const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
   const [userMobileNumber, setUserMobileNumber] = useState("");

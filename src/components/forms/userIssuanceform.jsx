@@ -6,7 +6,7 @@ import {
 import "./issuanceform.css";
 import Button from "../button/button";
 import { formatDateTime } from "../../utils/formateDateOrTime";
-import Input from "../Input/input";
+import Input from "../input/input";
 
 const UserIssuanceform = ({ onSubmit, selectedUser, onClose }) => {
   const [bookTitle, setBookTitle] = useState("");

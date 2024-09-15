@@ -332,11 +332,13 @@ const Categories = () => {
               name: "name",
               type: "text",
               placeholder: "Category Name",
+              label: "Name",
               value: editingCategory ? editingCategory.name : "",
             },
             {
               name: "categoryDesc",
               type: "text",
+              label: "Description", 
               placeholder: "Category Description",
 
               value: editingCategory ? editingCategory.categoryDesc : "",

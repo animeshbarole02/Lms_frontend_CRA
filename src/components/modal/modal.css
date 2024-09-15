@@ -69,6 +69,10 @@
       font-weight: 500;
      
   }
+
+  .dynamic-form-label {
+    color:black ;
+  }
   
   .modal-form-btn-div {
       display: flex;
