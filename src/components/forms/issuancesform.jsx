@@ -49,8 +49,10 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    
+    const currentDate = new Date().toISOString().slice(0, 10); 
     setMessage("");
+
+   
     if (!userMobileNumber) {
       setErrors((prevErrors) => ({
         ...prevErrors,
@@ -82,12 +84,13 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
       }));
       return;
     }
+     
     let returnedAt = null;
 
     if (issuanceType === "Home" && expectedReturn) {
       returnedAt = formatDateTime(new Date(expectedReturn).toLocaleString());
     } else if (issuanceType === "Library" && returnTime) {
-      const currentDate = new Date().toISOString().slice(0, 10); // Get the current date
+     
       returnedAt = formatDateTime(
         new Date(`${currentDate}T${returnTime}`).toLocaleString()
       );

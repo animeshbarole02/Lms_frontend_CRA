@@ -89,11 +89,11 @@ const Categories = () => {
     const newSearchTerm = event.target.value;
     const trimmedSearchTerm = newSearchTerm.trim();
     setSearchTerm(newSearchTerm);
-
-    if (trimmedSearchTerm.length < 3 && trimmedSearchTerm.length > 0) {
+  
+    
+    if (trimmedSearchTerm.length === 0) {
       loadCategories();
-    } else {
-
+    } else if (trimmedSearchTerm.length >= 3) {
       debounceSearch(trimmedSearchTerm);
     }
   };
