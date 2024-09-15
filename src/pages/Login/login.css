@@ -70,7 +70,8 @@
     margin: 20px 0px;
 }
 
-label {
+.login-label{
+    color: black;
     display: block;
     padding: 0.5rem 0px;
 }

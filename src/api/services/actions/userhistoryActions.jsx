@@ -3,7 +3,7 @@ import { USER_HISTORY_BASE_URL } from "../../apiConstants";
 
 export const fetchUserHistoryDetails = async (userId, page = 0, size = 10) => {
   try {
-    const response = await get(`${USER_HISTORY_BASE_URL}/userIssuanceDetails`, {
+    const response = await get(`${USER_HISTORY_BASE_URL}/details`, {
       userId,
       page,
       size,

@@ -18,7 +18,7 @@ import UserIssuanceform from "../../components/forms/userIssuanceform";
 import { createIssuance } from "../../api/services/actions/issuancesActions";
 
 import { generatePassword } from "../../utils/generatePassword";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ConfirmationModal from "../../components/modal/confirmationModal";
 import Tooltip from "../../components/tooltip/toolTip";
 import Toast from "../../components/toast/toast";

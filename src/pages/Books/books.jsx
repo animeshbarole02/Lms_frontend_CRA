@@ -18,7 +18,7 @@ import Tooltip from "../../components/tooltip/toolTip";
 import "./books.css";
 import IssuanceForm from "../../components/forms/issuancesform";
 import { createIssuance } from "../../api/services/actions/issuancesActions";
-import { Navigate, useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import Toast from "../../components/toast/toast";
 import ConfirmationModal from "../../components/modal/confirmationModal";
 import debounce from "../../utils/debounce";
@@ -39,8 +39,8 @@ const Books = () => {
   const [categories, setCategories] = useState([]);
   const [isIssuanceModalOpen, setIsIssuanceModalOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState(null);
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false); // Add state for confirm modal
-  const [bookToDelete, setBookToDelete] = useState(null); // Add state for book to delete
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false); 
+  const [bookToDelete, setBookToDelete] = useState(null); 
   const [toast, setToast] = useState({
     message: "",
     type: "success",
@@ -177,10 +177,17 @@ const Books = () => {
       }));
       hadError = true;
     }
-    if (quantity === null || isNaN(quantity) || quantity <= 0) {
+    const parsedQuantity = Number(quantity);
+
+    if (
+      quantity === null || 
+      isNaN(parsedQuantity) || 
+      parsedQuantity <= 0 || 
+      !Number.isInteger(parsedQuantity)
+    ) {
       setErrors((prevErrors) => ({
         ...prevErrors,
-        quantity: "Quantity must be a positive number.",
+        quantity: "Quantity must be a positive whole number.",
       }));
       hadError = true;
     }

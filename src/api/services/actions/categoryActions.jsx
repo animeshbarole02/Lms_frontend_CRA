@@ -1,4 +1,4 @@
-import { get, post, put, del, patch } from "../../apiServices";
+import { get, post, del, patch } from "../../apiServices";
 import { CATEGORY_BASE_URL } from "../../apiConstants";
 
 export const fetchCategories = async (page = 0, size = 8, searchTerm = "") => {
@@ -12,20 +12,6 @@ export const fetchCategories = async (page = 0, size = 8, searchTerm = "") => {
     return { success: true, data: response}
   } catch (error) {
     console.error("Failed to Fetch Categories :", error);
-    throw error;
-  }
-};
-
-
-export const fetchAllCounts = async () => {
-  try {
-    const response = await get(`${CATEGORY_BASE_URL}/count/all`);
-
-     return { success: true, data: response}
-    
-    
-  } catch (error) {
-    console.error("Error fetching all counts:", error);
     throw error;
   }
 };
@@ -92,7 +78,7 @@ export const updateCategory = async (categoryId, updatedCategory) => {
 
 export const fetchAllCategories = async () => {
   try {
-    const response = await get(`${CATEGORY_BASE_URL}/getAll`);
+    const response = await get(`${CATEGORY_BASE_URL}/getList`);
 
     return { success: true, data: response}
   } catch (error) {

@@ -5,6 +5,7 @@ import Button from "../../components/button/button";
 import "./login.css";
 import { useDispatch } from "react-redux";
 import { loginSuccess, setAuthFromLocalStorage, setError } from "../../redux/authSlice";
+import { BASE_URL, CURRENT_USER, SIGNIN_BASE_URL } from "../../api/apiConstants";
 
 const Login = () => {
   const [usernameOrPhoneNumber, setUsernameOrPhoneNumber] = useState("");
@@ -26,7 +27,7 @@ const Login = () => {
 
   const fetchUserInfo = async (token) => {
     try {
-      const response = await fetch("http://localhost:8080/api/v1/currentUser", {
+      const response = await fetch(`${BASE_URL}${CURRENT_USER}`, {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -87,7 +88,7 @@ const Login = () => {
 
     try {
     
-      const response = await fetch("http://localhost:8080/api/v1/signin", {
+      const response = await fetch(`${BASE_URL}${SIGNIN_BASE_URL}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -149,7 +150,7 @@ const Login = () => {
             <div className="form">
               <form onSubmit={handleLogin}>
                 <div className="form-group">
-                  <label htmlFor="username">Email or Mobile Number</label>
+                  <label className="login-label" htmlFor="username">Email or Mobile Number</label>
                   <input
                     type="text"
                     id="username"
@@ -162,7 +163,7 @@ const Login = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="password">Password</label>
+                  <label className ="login-label"htmlFor="password">Password</label>
                   <input
                     type="password"
                     id="password"

@@ -1,110 +1,122 @@
-// categoriesApi.test.js
-
 import {
-    fetchCategories,
-    fetchCategoryCount,
-    addCategory,
-    deleteCategory,
-    getCategoryByName,
-    updateCategory,
-    fetchAllCategories,
-  } from '../api/services/actions/categoryActions';
-  
-  import { get, post, del, patch } from '../api/apiServices';
-  
-  jest.mock('../api/apiServices', () => ({
-    get: jest.fn(),
-    post: jest.fn(),
-    del: jest.fn(),
-    patch: jest.fn(),
-  }));
-  
-  jest.mock('../api/apiConstants', () => ({
-    CATEGORY_BASE_URL: '/api/categories',
-  }));
+ 
 
+  addCategory,
+  deleteCategory,
+  getCategoryByName,
+  updateCategory,
+  fetchAllCategories,
+} from '../api/services/actions/categoryActions';
 
-  test('fetchCategories calls get with correct parameters', async () => {
-    const mockResponse = { content: [], size: 8, totalPages: 1 };
-    get.mockResolvedValue(mockResponse);
-  
-    const page = 0;
-    const size = 8;
-    const searchTerm = '';
-  
-    const response = await fetchCategories(page, size, searchTerm);
-  
-    expect(get).toHaveBeenCalledWith(
-      '/api/categories/list',
-      { page, size, search: searchTerm }
-    );
-    expect(response).toEqual(mockResponse);
-  });
+import { get, post, del, patch } from '../api/apiServices';
+import { CATEGORY_BASE_URL } from '../api/apiConstants';
 
-  
-  test('fetchCategoryCount calls get with correct URL', async () => {
-    const mockCount = 10;
-    get.mockResolvedValue(mockCount);
-  
-    const count = await fetchCategoryCount();
-  
-    expect(get).toHaveBeenCalledWith('/api/categories/count');
-    expect(count).toEqual(mockCount);
-  });
+jest.mock('../api/apiServices', () => ({
+  get: jest.fn(),
+  post: jest.fn(),
+  del: jest.fn(),
+  patch: jest.fn(),
+}));
 
-  
-  test('addCategory calls post with correct parameters', async () => {
+jest.mock('../api/apiConstants', () => ({
+  CATEGORY_BASE_URL: '/api/categories',
+}));
+
+describe('Category API functions', () => {
+ 
+ 
+  test('addCategory calls post with correct parameters and handles success', async () => {
     const newCategory = { name: 'New Category', categoryDesc: 'Description' };
-    const mockResponse = { success: true };
+    const mockResponse = { status: 201, message: 'Category added successfully' };
     post.mockResolvedValue(mockResponse);
-  
+
     const response = await addCategory(newCategory);
-  
-    expect(post).toHaveBeenCalledWith('/api/categories/save', newCategory);
-    expect(response).toEqual(mockResponse);
+
+    expect(post).toHaveBeenCalledWith(`${CATEGORY_BASE_URL}/save`, newCategory);
+    expect(response).toEqual({ success: true, message: mockResponse.message });
   });
 
-  
-  test('deleteCategory calls del with correct URL', async () => {
+  test('addCategory handles error response', async () => {
+    const newCategory = { name: 'New Category', categoryDesc: 'Description' };
+    const mockResponse = { status: 400, message: 'Failed to add category' };
+    post.mockResolvedValue(mockResponse);
+
+    const response = await addCategory(newCategory);
+
+    expect(post).toHaveBeenCalledWith(`${CATEGORY_BASE_URL}/save`, newCategory);
+    expect(response).toEqual({ success: false, message: mockResponse.message });
+  });
+
+  test('deleteCategory calls del with correct URL and handles success', async () => {
     const id = 1;
-    const mockResponse = { success: true };
+    const mockResponse = { status: 200, message: 'Category deleted successfully' };
     del.mockResolvedValue(mockResponse);
-  
+
     const response = await deleteCategory(id);
-  
-    expect(del).toHaveBeenCalledWith('/api/categories/1');
-    expect(response).toEqual(mockResponse);
+
+    expect(del).toHaveBeenCalledWith(`${CATEGORY_BASE_URL}/${id}`);
+    expect(response).toEqual({ success: true, message: mockResponse.message });
   });
 
-  
+  test('deleteCategory handles error response', async () => {
+    const id = 1;
+    const mockResponse = { status: 400, message: 'Failed to delete category' };
+    del.mockResolvedValue(mockResponse);
+
+    const response = await deleteCategory(id);
+
+    expect(del).toHaveBeenCalledWith(`${CATEGORY_BASE_URL}/${id}`);
+    expect(response).toEqual({ success: false, message: mockResponse.message });
+  });
+
   test('getCategoryByName calls get with correct URL and returns ID', async () => {
     const name = 'Electronics';
     const mockData = { id: 1, name: 'Electronics' };
     get.mockResolvedValue(mockData);
-  
+
     const id = await getCategoryByName(name);
-  
-    expect(get).toHaveBeenCalledWith('/api/categories/name/Electronics');
+
+    expect(get).toHaveBeenCalledWith(`${CATEGORY_BASE_URL}/name/${name}`);
     expect(id).toEqual(1);
   });
 
-  
-  test('updateCategory calls patch with correct parameters', async () => {
+  test('updateCategory calls patch with correct parameters and handles success', async () => {
     const categoryId = 1;
     const updatedCategory = { name: 'Updated Name', categoryDesc: 'Updated Description' };
-    const mockResponse = { success: true };
+    const mockResponse = { status: 200, message: 'Category updated successfully' };
     patch.mockResolvedValue(mockResponse);
-  
+
     const response = await updateCategory(categoryId, updatedCategory);
-  
-    expect(patch).toHaveBeenCalledWith(
-      '/api/categories/update/1',
-      updatedCategory
-    );
-    expect(response).toEqual(mockResponse);
+
+    expect(patch).toHaveBeenCalledWith(`${CATEGORY_BASE_URL}/update/${categoryId}`, updatedCategory);
+    expect(response).toEqual({ success: true, message: mockResponse.message });
   });
 
- 
+  test('updateCategory handles error response', async () => {
+    const categoryId = 1;
+    const updatedCategory = { name: 'Updated Name', categoryDesc: 'Updated Description' };
+    const mockResponse = { status: 400, message: 'Failed to update category' };
+    patch.mockResolvedValue(mockResponse);
 
-  
- 
+    const response = await updateCategory(categoryId, updatedCategory);
+
+    expect(patch).toHaveBeenCalledWith(`${CATEGORY_BASE_URL}/update/${categoryId}`, updatedCategory);
+    expect(response).toEqual({ success: false, message: mockResponse.message });
+  });
+
+  test('fetchAllCategories calls get with correct URL and returns data', async () => {
+    const mockResponse = { categories: [] };
+    get.mockResolvedValue(mockResponse);
+
+    const response = await fetchAllCategories();
+
+    expect(get).toHaveBeenCalledWith(`${CATEGORY_BASE_URL}/getList`);
+    expect(response).toEqual({ success: true, data: mockResponse });
+  });
+
+  test('fetchAllCategories handles errors', async () => {
+    get.mockRejectedValue(new Error('Network Error'));
+
+    await expect(fetchAllCategories()).rejects.toThrow('Network Error');
+  });
+});

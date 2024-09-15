@@ -1,8 +1,7 @@
 import React from 'react';
-import { render, screen, waitFor, fireEvent, act, findByAltText, renderHook } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, act} from '@testing-library/react';
 import Categories from '../pages/categories/categories';
-import { useState } from 'react';
-import { fetchCategories, deleteCategory ,addCategory ,updateCategory} from '../api/services/actions/categoryActions';
+import { fetchCategories, deleteCategory } from '../api/services/actions/categoryActions';
 
 
 

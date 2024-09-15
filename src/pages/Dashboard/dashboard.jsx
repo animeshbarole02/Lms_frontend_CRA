@@ -8,8 +8,9 @@ import TotalUsers from "../../assets/icons/TotalUsers.png";
 import AdminHOC from "../../hoc/AdminHOC";
 import Table from "../../components/table/table";
 import { fetchBooks } from "../../api/services/actions/bookActions";
-import { fetchAllCounts, fetchCategories } from "../../api/services/actions/categoryActions";
+import { fetchCategories } from "../../api/services/actions/categoryActions";
 import Loader from "../../components/loader/loader";
+import { fetchCount } from "../../api/services/actions/dashboardActions";
 
 const Dashboard = () => {
   const [userCount, setUserCount] = useState(0);
@@ -32,7 +33,7 @@ const Dashboard = () => {
     const getCounts = async () => {
       try {
         setLoading(true);
-        const response = await fetchAllCounts();
+        const response = await fetchCount();
        
         if(response.success) 
         {

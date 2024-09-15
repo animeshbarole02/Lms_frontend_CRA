@@ -9,8 +9,8 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         <img
           src={LeftPageIcon}
           alt="Left"
-          onClick={() => onPageChange('prev')}
-          disabled={currentPage === 0}
+          onClick={() => currentPage > 0 && onPageChange('prev')}
+          className={currentPage === 0 ? 'disabled' : ''}
         />
       </div>
       <div className="pagination-number">
@@ -26,8 +26,8 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         <img
           src={RightPageIcon}
           alt="Right"
-          onClick={() => onPageChange('next')}
-          disabled={currentPage >= totalPages - 1}
+          onClick={() => currentPage < totalPages - 1 && onPageChange('next')}
+          className={currentPage >= totalPages - 1 ? 'disabled' : ''}
         />
       </div>
     </div>
