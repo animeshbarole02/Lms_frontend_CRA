@@ -83,12 +83,13 @@ const Users = () => {
   ];
 
   const navigate = useNavigate();
-
+  
   const debounceSearch = useCallback(
     debounce((newSearchTerm) => {
+      
       loadUsers(newSearchTerm);
     }, 1000),
-    []
+    [] 
   );
 
   useEffect(() => {

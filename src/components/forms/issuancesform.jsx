@@ -7,7 +7,6 @@ import Input from "../input/input";
 
 const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
   const [userMobileNumber, setUserMobileNumber] = useState("");
-
   const [userId, setUserId] = useState(null);
   const [issuanceType, setIssuanceType] = useState("Home");
   const [returnTime, setReturnTime] = useState("");
