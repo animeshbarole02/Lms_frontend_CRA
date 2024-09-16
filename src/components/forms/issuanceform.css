@@ -1,0 +1,103 @@
+.issuance-form {
+    display: flex;
+    flex-direction: column;
+  
+  
+  }
+
+
+
+.issuance-form h2 {
+  color: #e04736;
+}  
+
+.issuance-form h2 span {
+  font-weight: 300;
+}
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+  }
+
+  .form-group label {
+    font-size: 15px;
+    font-weight:800;
+    color: #000000;
+
+  }
+  
+  .form-group input {
+    padding: 10px;
+
+    border: none;
+    outline: none;
+    border: 2px solid lightcoral;
+  }
+
+  
+  .form-group select {
+    padding: 10px;
+
+    border: 2px solid lightcoral;
+  }
+  .submit-button {
+    padding: 0.5rem 1rem;
+    background-color:rgb(253, 76, 76);
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .submit-button:hover {
+    background-color: #e84012;
+  }
+  
+
+  .dropdown-suggestions {
+    border: 1px solid #ccc;
+    max-height: 150px;
+    overflow-y: auto;
+    position: relative;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    z-index: 1;
+  }
+  
+  .dropdown-suggestions li {
+    padding: 8px;
+    background-color: white;
+    cursor: pointer;
+  }
+  
+  .dropdown-suggestions li:hover {
+   
+    background-color: #f0f0f0;
+  }
+  
+  .error-message {
+    color: red;
+  }
+  
+  .success-message {
+    color: green;
+  }
+
+  @media (max-width: 768px) {
+    .issuance-form h2 {
+        font-size: 1.25rem; 
+    }
+
+    .form-group input, .form-group select {
+        font-size: 0.875rem; 
+    }
+
+    .submit-button {
+        width: 100%;
+        padding: 0.75rem; 
+        font-size: 1rem; 
+    }
+}

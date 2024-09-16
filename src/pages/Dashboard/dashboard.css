@@ -1,0 +1,133 @@
+
+   .leftdash-div {
+       position: relative;
+       padding: 1% 2% 0px 1%;
+      
+    }
+    
+    .contains {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin-left: 15%;
+     }
+    
+    .dashboard-div .contains .card-table-div {
+
+        position: relative;
+        top: 3%;
+    }
+
+    .rightdash-table {
+        height: 6vh;
+        width: 38vw;
+    }
+    
+    .rightdash-div {
+        position: relative;
+        left: 3%;
+        bottom: 30%;
+        display: flex;
+        flex-direction: column;     
+    }
+
+
+
+    .rightdashcard {
+        display: flex;
+    }
+    .heading h2 {
+       color:  #ffa33a; 
+    }
+    
+    .content span {
+        font-size: 25px;
+        font-weight: 600;
+       
+    }
+    .content p {
+        font-size: 20px;
+        margin-top: 10%;
+         color: #000000; ;
+        line-height: 3.0rem;
+    }
+    
+    .dashborad-table-heading{
+          
+        font-size: 25px;
+        font-weight: 600;
+     }
+   
+    .cards-div {
+        
+        display: grid;
+        grid-template-columns:  auto 1fr;
+        width: 100%;
+        margin-right: 30px; 
+        place-self: center;
+        gap: 10px;
+    
+    
+    }
+    
+    .cards-div .card-div:nth-child(1)  img{
+       position: relative;
+       bottom:4.5%;
+    }
+    
+    .cards-div .card-div:nth-child(3),
+    .cards-div .card-div:nth-child(4) {
+    
+        margin-top: -5px;
+    }
+    
+    .cards-div .card-div:nth-child(3) img {
+        margin-left: 2%;
+    }
+    
+    .cards-div .card-div:nth-child(4) img {
+        
+        width: 8vw; 
+        margin-top: 6%;
+    }
+    
+    
+    .card-div {
+        place-self: center;
+        margin:10%;   
+    }
+    
+
+    .dashboard-table {
+        width: 35vw;
+        height: 30vh;
+        margin-top: 1%;
+    }
+ 
+
+    @media (max-width: 768px) { 
+       
+
+        .dashboard-div .contains .card-table-div {
+            position: relative;
+            top: 8%;
+            left: 10%;
+
+    }
+
+    .cards-div .card-div:nth-child(4) img {
+        width: 12vw;
+        margin-top: 25%;
+    }
+
+    .cards-div .card-div:nth-child(2)  img{
+        position: relative;
+        bottom:10%;
+     }
+     .rightdash-table {
+       display: none;
+    }
+     
+
+}

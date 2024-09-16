@@ -1,0 +1,269 @@
+
+.center-div {
+    width: 78vw;
+    position: relative;
+    left: 20%;
+    height: 80vh;
+    padding-top: 7.5%;
+}
+
+.center-div .upper-div-text {
+    
+    width: 10vw;
+    background-color: #ffffff;
+    color: black;
+    font-size: 25px;
+    font-weight: 250;
+    margin-bottom: 2%;
+}
+
+
+.upper-div {
+    display: flex;
+    justify-content: space-between;    
+}
+
+.upper-div-btns {
+   
+    display: flex;
+    gap: 10px;
+} 
+
+.lower-div {
+   
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    width: 100%;    
+}
+
+
+.search-input-div {
+    display: flex;
+    border: 2.0px solid #fa604f; ;
+    height: 4.8vh;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+    width: 13vw;
+   
+}
+
+
+
+.search-icon-div {
+     margin: 0px 10px 0px 10px;
+}
+.search-icon-div img{
+     height: 2.0vh;
+}
+
+
+
+.search-categories-div .search-input {
+   width: 10vw;
+   height: 3.5vh;
+   border: none;
+   outline: none;
+   margin-right: 5px;
+}
+
+
+.add-categories-div button {
+   padding: 6.5px;
+   background-color: white;
+}
+
+
+.add-categories-div .add-categories-btn
+{
+    width: 10vw;
+    border: 2px solid  #ec6657;
+}
+
+
+
+.actionicons {
+    display: flex;
+    justify-content: center;
+    gap:20px
+  }
+ .action-icon{
+     
+    height: 5vh;
+    cursor: pointer;
+    
+  }
+  .action-icon.disabled {
+    opacity: 0.5; 
+    pointer-events: none; 
+  }
+  
+  .action-icon.disabled:hover {
+    cursor: not-allowed; 
+  }
+
+  
+
+  .pagination-div {
+    display: flex;
+    margin-top: 2%;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    position: fixed;
+    bottom: 2.5%;
+    left: 6%; 
+    right: 0;  
+  }
+
+
+  .left-pagination {
+    margin-right: 1%;
+  }
+   
+  .right-pagination {
+    margin-left: 1%;
+  }
+
+  .left-pagination img {
+    height: 3vh;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+  }
+
+  .left-pagination img :hover {
+
+     transform: translateY(-5px);
+ }
+
+  .right-pagination img {
+    height: 3vh;
+    cursor: pointer;
+  }
+
+
+  .pagination-number span {
+    font-size: 20px;
+  }
+
+ 
+
+  @media screen and (max-width: 768px) {
+    .action-icon {
+        height: 3vh;  
+    }
+
+    .actionicons {
+      display: flex;
+      justify-content: center;
+      gap:5px
+    }
+
+    .center-div {
+      width: 78vw;
+      position: relative;
+      left: 25%;
+      height: 80vh;
+      padding-top: 18%;
+      padding-right: 1%;
+      padding-left: 1%;
+   
+   
+   
+  }
+
+  .upper-div {
+    display: flex;
+    justify-content: space-between;
+  
+    
+    
+    
+}
+
+.upper-div-btns {
+    display: flex;
+    gap: 10px;
+} 
+
+.lower-div {
+   
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+
+
+
+
+.search-input-div {
+    display: flex;
+    border: 1.0px solid #fa604f; ;
+    height: 4.0vh;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+    width: 20vw;
+}
+
+.search-categories-div .search-input {
+  width: 10vw;
+  height: vh;
+  border: none;
+  outline: none;
+  margin-right: 5px;
+}
+
+
+
+.search-icon-div {
+    margin: 0px 10px 0px 10px;
+}
+.search-icon-div img
+{
+
+    height: 1.5vh;
+}
+
+
+.add-categories-div button {
+  padding: 2px;
+  font-size: 15px;
+  background-color: white;
+ 
+}
+
+
+.add-categories-div .add-categories-btn
+{
+   width: 18vw;
+   height: 4vh;
+   border: px solid  #ec6657;
+}
+
+.center-div .upper-div-text {
+    
+
+  width: 10vw;
+  background-color: #ffffff;
+  color: black;
+  font-size: 22px;
+  font-weight: 250;
+ 
+  margin-bottom: 2%;
+}
+ .issue-button {
+   width: 8vw;
+   font-size: 12px;
+  }
+
+  .history-button {
+    width: 8vw;
+    font-size: 12px;
+  }
+
+}
