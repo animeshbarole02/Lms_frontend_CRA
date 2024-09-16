@@ -1,11 +1,11 @@
 import React from "react";
 
-const Input = ({ field, value, onChange, onFocus,min }) => {
-  const { type, name, placeholder, options = [] } = field;
+const Input = ({ field, value, onChange, onFocus }) => {
+  const { type, name, placeholder, options = [], min } = field;
 
   if (type === "select") {
     return (
-      <select name={name} value={value || ""} onChange={onChange} onFocus={onFocus} >
+      <select name={name} value={value || ""} onChange={onChange} onFocus={onFocus}>
         <option value="" disabled>
           {placeholder}
         </option>
@@ -25,8 +25,8 @@ const Input = ({ field, value, onChange, onFocus,min }) => {
       placeholder={placeholder}
       value={value}
       onChange={onChange}
-     
-      min={field.min}
+      onFocus={onFocus}
+      min={type === "time" || type === "datetime-local" ? min : undefined} 
     />
   );
 };

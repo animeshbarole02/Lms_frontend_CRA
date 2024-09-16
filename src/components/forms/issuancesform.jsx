@@ -47,12 +47,49 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
     }
   };
 
+  const handleReturnTimeChange = (e) => {
+    const selectedTime = e.target.value;
+    const currentTime = new Date().toTimeString().slice(0, 5);
+
+    if (selectedTime < currentTime) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        returnDate: "Cannot select a time earlier than the current time.",
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        returnDate: "",
+      }));
+      setReturnTime(selectedTime);
+    }
+  };
+
+  const handleExpectedReturnChange = (e) => {
+    const selectedDateTime = new Date(e.target.value).getTime();
+    const currentDateTime = new Date().getTime();
+  
+    if (selectedDateTime < currentDateTime) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        returnDate: "Cannot select a return date/time earlier than the current date/time.",
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        returnDate: "",
+      }));
+      setExpectedReturn(e.target.value);
+    }
+  };
+  
+
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const currentDate = new Date().toISOString().slice(0, 10); 
     setMessage("");
-
-   
+    
     if (!userMobileNumber) {
       setErrors((prevErrors) => ({
         ...prevErrors,
@@ -170,7 +207,7 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
                   min: new Date().toISOString().slice(0, 16),
                 }}
                 value={expectedReturn}
-                onChange={(e) => setExpectedReturn(e.target.value)}
+                onChange={handleExpectedReturnChange}
               />
               {errors.returnDate && (
                 <p className="error-message">{errors.returnDate}</p>
@@ -179,9 +216,10 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
           ) : (
             <>
               <Input
-                field={{ type: "time", name: "returnTime" }}
+                field={{ type: "time", name: "returnTime" ,  min: new Date().toTimeString().slice(0, 5),}}
                 value={returnTime}
-                onChange={(e) => setReturnTime(e.target.value)}
+               onChange={handleReturnTimeChange}
+
               />
               {errors.returnDate && (
                 <p className="error-message">{errors.returnDate}</p>

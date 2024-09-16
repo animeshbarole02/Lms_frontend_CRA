@@ -1,8 +1,5 @@
 import { useState } from "react";
-import {
-
-  findBookSuggestions,
-} from "../../api/services/actions/bookActions";
+import { findBookSuggestions } from "../../api/services/actions/bookActions";
 import "./issuanceform.css";
 import Button from "../button/button";
 import { formatDateTime } from "../../utils/formateDateOrTime";
@@ -13,9 +10,8 @@ const UserIssuanceform = ({ onSubmit, selectedUser, onClose }) => {
   const [bookId, setBookId] = useState(null);
   const [issuanceType, setIssuanceType] = useState("Home");
   const [returnTime, setReturnTime] = useState("");
-  const [issuedAt] = useState(formatDateTime(new Date().toLocaleString())); //
+  const [issuedAt] = useState(formatDateTime(new Date().toLocaleString()));
   const [expectedReturn, setExpectedReturn] = useState("");
- 
   const [showDropdown, setShowDropdown] = useState(false);
   const [bookSuggestions, setBookSuggestions] = useState([]);
   const [errors, setErrors] = useState({ bookTitle: "", returnDate: "" });
@@ -52,6 +48,42 @@ const UserIssuanceform = ({ onSubmit, selectedUser, onClose }) => {
     setShowDropdown(false);
   };
 
+  const handleReturnTimeChange = (e) => {
+    const selectedTime = e.target.value;
+    const currentTime = new Date().toTimeString().slice(0, 5);
+
+    if (selectedTime < currentTime) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        returnDate: "Cannot select a time earlier than the current time.",
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        returnDate: "",
+      }));
+      setReturnTime(selectedTime);
+    }
+  };
+
+  const handleExpectedReturnChange = (e) => {
+    const selectedDateTime = new Date(e.target.value).getTime();
+    const currentDateTime = new Date().getTime();
+
+    if (selectedDateTime < currentDateTime) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        returnDate: "Cannot select a return date/time earlier than the current date/time.",
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        returnDate: "",
+      }));
+      setExpectedReturn(e.target.value);
+    }
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
 
@@ -61,8 +93,6 @@ const UserIssuanceform = ({ onSubmit, selectedUser, onClose }) => {
         bookTitle: "Please enter a valid book title.",
       }));
       return;
-    } else {
-      setErrors((prevErrors) => ({ ...prevErrors, bookTitle: "" }));
     }
 
     if (issuanceType === "Home" && !expectedReturn) {
@@ -77,22 +107,19 @@ const UserIssuanceform = ({ onSubmit, selectedUser, onClose }) => {
         returnDate: "Please enter a valid return time.",
       }));
       return;
-    } else {
-      setErrors((prevErrors) => ({ ...prevErrors, returnDate: "" }));
     }
+
     let returnedAt = null;
 
-  
     if (issuanceType === "Home" && expectedReturn) {
       returnedAt = formatDateTime(new Date(expectedReturn).toLocaleString());
-    }
-   
-    else if (issuanceType === "Library" && returnTime) {
+    } else if (issuanceType === "Library" && returnTime) {
       const currentDate = new Date().toISOString().slice(0, 10);
       returnedAt = formatDateTime(
         new Date(`${currentDate}T${returnTime}`).toLocaleString()
       );
     }
+
     const issuanceDetails = {
       userId: selectedUser.id,
       bookId,
@@ -102,6 +129,7 @@ const UserIssuanceform = ({ onSubmit, selectedUser, onClose }) => {
       status: "Issued",
       issuanceType,
     };
+
     onSubmit(issuanceDetails);
     onClose();
   };
@@ -155,19 +183,23 @@ const UserIssuanceform = ({ onSubmit, selectedUser, onClose }) => {
           <label>Expected Return</label>
           {issuanceType === "Home" ? (
             <Input
-            field={{
-              type: "datetime-local",
-              name: "expectedReturn",
-              min: new Date().toISOString().slice(0, 16),
-            }}
-            value={expectedReturn}
-            onChange={(e) => setExpectedReturn(e.target.value)}
-          />
+              field={{
+                type: "datetime-local",
+                name: "expectedReturn",
+                min: new Date().toISOString().slice(0, 16),
+              }}
+              value={expectedReturn}
+              onChange={handleExpectedReturnChange}
+            />
           ) : (
             <Input
-              field={{ type: "time", name: "returnTime" }}
+              field={{
+                type: "time",
+                name: "returnTime",
+                min: new Date().toTimeString().slice(0, 5),
+              }}
               value={returnTime}
-              onChange={(e) => setReturnTime(e.target.value)}
+              onChange={handleReturnTimeChange}
             />
           )}
           {errors.returnDate && (
