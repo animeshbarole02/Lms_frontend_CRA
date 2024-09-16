@@ -23,7 +23,7 @@ const Login = () => {
       dispatch(setAuthFromLocalStorage({ jwtToken: token }));
       fetchUserInfo(token);
     }
-  }, [dispatch]);
+  });
 
   const fetchUserInfo = async (token) => {
     try {

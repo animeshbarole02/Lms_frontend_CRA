@@ -259,7 +259,7 @@ const Issuances = () => {
           )}
         </div>
       </div>
-      {/* Modal Component */}
+   
 
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
         <Dynamicform

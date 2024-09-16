@@ -16,18 +16,14 @@ import {
   setAuthFromLocalStorage,
   loginSuccess,
   logout,
-} from "./redux/authSlice"; 
+} from "./redux/authSlice";
 import History from "./pages/histories/userPageHistory";
 import BookHistory from "./pages/histories/bookPageHistory";
 import { BASE_URL, CURRENT_USER } from "./api/apiConstants";
 
-
-
 function App() {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
-
-  
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -37,12 +33,11 @@ function App() {
     } else {
       dispatch(logout());
     }
-  }, [dispatch]);
+  });
 
   const fetchUserInfo = async (token) => {
-  
     try {
-      const response = await fetch(`${BASE_URL}${CURRENT_USER}`,{
+      const response = await fetch(`${BASE_URL}${CURRENT_USER}`, {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -50,13 +45,12 @@ function App() {
       if (response.ok) {
         const data = await response.json();
         dispatch(loginSuccess({ user: data, jwtToken: token }));
-        
       } else {
-        dispatch(logout()); 
+        dispatch(logout());
       }
     } catch (error) {
       console.error("Error fetching user info:", error);
-      dispatch(logout()); 
+      dispatch(logout());
     }
   };
 
@@ -68,15 +62,15 @@ function App() {
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute >
-                < Dashboard />
+              <ProtectedRoute>
+                <Dashboard />
               </ProtectedRoute>
             }
           />
           <Route
             path="/categories"
             element={
-              <ProtectedRoute >
+              <ProtectedRoute>
                 <Categories />
               </ProtectedRoute>
             }
@@ -92,7 +86,7 @@ function App() {
           <Route
             path="/users"
             element={
-              <ProtectedRoute >
+              <ProtectedRoute>
                 <Users />
               </ProtectedRoute>
             }
@@ -100,26 +94,25 @@ function App() {
           <Route
             path="/issuances"
             element={
-              <ProtectedRoute >
+              <ProtectedRoute>
                 <Issuances />
               </ProtectedRoute>
             }
           />
-          
 
-          <Route 
-              path="/history"
-              element = {
-                <ProtectedRoute >
-                   <History/>
-                </ProtectedRoute>
-              }
+          <Route
+            path="/history"
+            element={
+              <ProtectedRoute>
+                <History />
+              </ProtectedRoute>
+            }
           />
 
-           <Route
+          <Route
             path="/bookHistory"
             element={
-              <ProtectedRoute >
+              <ProtectedRoute>
                 <BookHistory />
               </ProtectedRoute>
             }
@@ -127,23 +120,23 @@ function App() {
           <Route
             path="/userHistory"
             element={
-              <ProtectedRoute >
+              <ProtectedRoute>
                 <UserHistory />
               </ProtectedRoute>
             }
           />
-           
 
-           <Route
+          <Route
             path="*"
             element={
-              isAuthenticated ? <Navigate to={window.location.pathname} /> : <Navigate to="/" />
+              isAuthenticated ? (
+                <Navigate to={window.location.pathname} />
+              ) : (
+                <Navigate to="/" />
+              )
             }
           />
         </Routes>
-
-
-     
       </div>
     </BrowserRouter>
   );
