@@ -60,7 +60,7 @@ const Categories = () => {
   );
 
   useEffect(() => {
-    loadCategories(searchTerm);
+    loadCategories();
   }, [currentPage]);
 
   const loadCategories = async (search = "") => {
@@ -92,6 +92,7 @@ const Categories = () => {
   
     
     if (trimmedSearchTerm.length === 0) {
+      debounceSearch.cancel();
       loadCategories();
     } else if (trimmedSearchTerm.length >= 3) {
       debounceSearch(trimmedSearchTerm);

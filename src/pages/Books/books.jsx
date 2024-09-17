@@ -289,6 +289,7 @@ const Books = () => {
   
     
     if (trimmedSearchTerm.length === 0) {
+      debounceSearch.cancel();
       loadBooks();
     } else if (trimmedSearchTerm.length >= 3) {
       debounceSearch(trimmedSearchTerm);
