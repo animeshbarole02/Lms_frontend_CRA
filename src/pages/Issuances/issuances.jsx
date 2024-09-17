@@ -78,7 +78,7 @@ const Issuances = () => {
   );
 
   useEffect(() => {
-    loadIssuances(searchTerm);
+    loadIssuances();
   }, [currentPage]);
 
   const loadIssuances = async (search = "") => {
@@ -110,6 +110,7 @@ const Issuances = () => {
   
     
     if (trimmedSearchTerm.length === 0) {
+      debounceSearch.cancel();
       loadIssuances();
     } else if (trimmedSearchTerm.length >= 3) {
       debounceSearch(trimmedSearchTerm);

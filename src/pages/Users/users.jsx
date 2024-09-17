@@ -93,7 +93,7 @@ const Users = () => {
   );
 
   useEffect(() => {
-    loadUsers(searchTerm);
+    loadUsers();
   }, [currentPage]);
 
   const loadUsers = async (search = "") => {
@@ -256,6 +256,7 @@ const Users = () => {
   
     
     if (trimmedSearchTerm.length === 0) {
+      debounceSearch.cancel();
       loadUsers();
     } else if (trimmedSearchTerm.length >= 3) {
       debounceSearch(trimmedSearchTerm);

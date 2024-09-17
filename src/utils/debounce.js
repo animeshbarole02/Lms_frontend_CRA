@@ -1,9 +1,16 @@
 const debounce = (func, delay) => {
   let timer;
-  return (...args) => {
+
+  const debounced = (...args) => {
     clearTimeout(timer);
     timer = setTimeout(() => func(...args), delay);
   };
+
+  debounced.cancel = () => {
+    clearTimeout(timer);
+  };
+
+  return debounced;
 };
 
 export default debounce;
