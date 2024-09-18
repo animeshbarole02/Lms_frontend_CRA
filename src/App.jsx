@@ -15,7 +15,7 @@ import { useEffect } from "react";
 import {
   setAuthFromLocalStorage,
   loginSuccess,
-  logout,
+  setError,
 } from "./redux/authSlice";
 import History from "./pages/histories/userPageHistory";
 import BookHistory from "./pages/histories/bookPageHistory";
@@ -30,9 +30,7 @@ function App() {
     if (token) {
       dispatch(setAuthFromLocalStorage({ jwtToken: token }));
       fetchUserInfo(token);
-    } else {
-      dispatch(logout());
-    }
+    } 
   });
 
   const fetchUserInfo = async (token) => {
@@ -46,11 +44,11 @@ function App() {
         const data = await response.json();
         dispatch(loginSuccess({ user: data, jwtToken: token }));
       } else {
-        dispatch(logout());
+        dispatch(setError("Failed to fetch user information."));
       }
     } catch (error) {
       console.error("Error fetching user info:", error);
-      dispatch(logout());
+      dispatch(setError("An error occurred. Please try again later."));
     }
   };
 
