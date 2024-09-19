@@ -285,7 +285,7 @@ const Issuances = () => {
             },
           ]}
           onSubmit={handleEditIssuance}
-          isEditMode={!!editingIssuance}
+          isEditMode={editingIssuance}
           initialData={editingIssuance}
         />
       </Modal>

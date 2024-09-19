@@ -135,6 +135,14 @@ describe('Categories component', () => {
 
   
   describe('search functionality', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+  
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+  
     it('should debounce and fetch categories with the correct search term', async () => {
       const mockResponse = {
         content: [],
@@ -148,18 +156,34 @@ describe('Categories component', () => {
     
       const searchInput = screen.getByPlaceholderText('Search categories...');
     
-      fireEvent.change(searchInput, { target: { value: 'New search' } });
+      fireEvent.change(searchInput, { target: { value: 'Ne' } });
+      
     
-    
-      expect(fetchCategories).toHaveBeenCalledTimes(1);
-    
+      jest.advanceTimersByTime(500);
   
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-      });
-
+     
+      expect(fetchCategories).toHaveBeenCalledTimes(1);
+  
+      
+      fireEvent.change(searchInput, { target: { value: 'New search' } });
+  
+  
+      jest.advanceTimersByTime(1000);
+  
+     
       await waitFor(() => {
         expect(fetchCategories).toHaveBeenCalledWith(0, 9, 'New search');
+      });
+  
+      
+      fireEvent.change(searchInput, { target: { value: '' } });
+  
+     
+      jest.advanceTimersByTime(1000);
+  
+      
+      await waitFor(() => {
+        expect(fetchCategories).toHaveBeenCalledWith(0, 9, '');
       });
     });
   });

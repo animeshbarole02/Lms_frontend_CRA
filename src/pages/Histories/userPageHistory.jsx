@@ -44,7 +44,7 @@ const History = () => {
         const response = await fetchUserIssuanceDetails(
           userId,
           currentPage,
-          10
+          9
         );
         const data = response.data;
         const startIndex = currentPage * data.size;

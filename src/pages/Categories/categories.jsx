@@ -59,6 +59,8 @@ const Categories = () => {
     []
   );
 
+  
+
   useEffect(() => {
     loadCategories();
   }, [currentPage]);

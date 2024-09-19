@@ -86,13 +86,30 @@ const UserIssuanceform = ({ onSubmit, selectedUser, onClose }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-
+    let hasError = false;
     if (!bookId) {
       setErrors((prevErrors) => ({
         ...prevErrors,
         bookTitle: "Please enter a valid book title.",
       }));
-      return;
+
+      hasError = true;
+       
+    }
+    
+    if(!expectedReturn) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        returnDate: "Please enter a return date and try again.",
+      }));
+      
+      hasError = true;
+
+    }
+
+    if(hasError) 
+    {
+      return ;
     }
 
     if (issuanceType === "Home" && !expectedReturn) {

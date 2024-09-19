@@ -1,10 +1,10 @@
 import "./button.css";
 
-const Button = ({ onClick, text, active, className, disabled }) => {
+const Button = ({ onClick, text,className, disabled }) => {
   return (
     <div className="button-component-div">
       <button
-        className={`custom-button ${active ? "active" : ""} ${className}`}
+        className={`custom-button ${className}`}
         onClick={onClick}
         disabled={disabled}
       >

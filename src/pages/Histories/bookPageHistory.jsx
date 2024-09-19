@@ -45,7 +45,7 @@ const BookHistory = () => {
         const response = await fetchBookIssuanceDetails(
           bookId,
           currentPage,
-          10
+          9
         );
         const data = response.data;
         const startIndex = currentPage * data.size;

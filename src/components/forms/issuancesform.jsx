@@ -85,7 +85,10 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
 
 
   const handleSubmit = (event) => {
+
+    
     event.preventDefault();
+    let hasError= false;
     const currentDate = new Date().toISOString().slice(0, 10); 
     setMessage("");
     
@@ -94,7 +97,7 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
         ...prevErrors,
         mobileNumber: "Mobile number is required.",
       }));
-      return;
+      hasError = true;
     }
 
     if (!userId) {
@@ -102,6 +105,21 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
         ...prevErrors,
         mobileNumber: "Please enter a valid mobile number and try again.",
       }));
+      hasError = true;
+    }
+
+    if(!expectedReturn) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        returnDate: "Please enter a return date and try again.",
+      }));
+      
+      hasError = true;
+
+    }
+
+    if(hasError)
+    {
       return;
     }
 
