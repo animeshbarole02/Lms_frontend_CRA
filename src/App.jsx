@@ -31,7 +31,7 @@ function App() {
       dispatch(setAuthFromLocalStorage({ jwtToken: token }));
       fetchUserInfo(token);
     } 
-  });
+  },[]);
 
   const fetchUserInfo = async (token) => {
     try {

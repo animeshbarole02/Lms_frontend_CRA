@@ -40,6 +40,9 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
         mobileNumber: "",
       }));
     }
+    if (mobileNumber.length < 10) {
+      setMessage("");
+    }
 
     if (mobileNumber.length === 10) {
       fetchUserDetails(mobileNumber);
