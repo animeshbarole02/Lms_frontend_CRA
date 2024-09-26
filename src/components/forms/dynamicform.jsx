@@ -84,7 +84,7 @@ const DynamicForm = ({
                   field={field}
                   value={formData[field.name] || ""} 
                   onChange={handleInputChange}
-                  min={field.min}
+               
                 />
               )}
               {fieldErrors[field.name] && (

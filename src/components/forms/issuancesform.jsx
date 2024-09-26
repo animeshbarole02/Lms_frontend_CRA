@@ -126,21 +126,7 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
       return;
     }
 
-    if (issuanceType === "Home" && !expectedReturn) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        returnDate: "Expected return date is required.",
-      }));
-      return;
-    }
-
-    if (issuanceType === "Library" && !returnTime) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        returnDate: "Expected return time is required.",
-      }));
-      return;
-    }
+   
      
     let returnedAt = null;
 

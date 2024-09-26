@@ -202,7 +202,7 @@ const Issuances = () => {
             alt="Edit"
             className={`action-icon ${isEditDisabled ? "disabled" : ""}`}
             onClick={() => !isEditDisabled && handleEdit(rowData)}
-            style={{ cursor: isEditDisabled ? "not-allowed" : "pointer" }}
+
           />
         </Tooltip>
         <Tooltip message="Delete">
